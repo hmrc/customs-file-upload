@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.customs.file.upload.controllers
+package uk.gov.hmrc.customs.file.upload.services
 
 import javax.inject.{Inject, Singleton}
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthAction, ValidateAndExtractHeadersAction}
-import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
+import play.api.Configuration
 
 @Singleton
-class Common @Inject() (
-  val authAction: AuthAction,
-  val validateAndExtractHeadersAction: ValidateAndExtractHeadersAction,
-  val logger: FileUploadLogger
-)
-
+//TODO add post-parsing validation rules here?
+class FileUploadXmlValidationService @Inject()(configuration: Configuration) extends XmlValidationService(configuration, "xsd.locations.fileupload")

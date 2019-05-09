@@ -19,10 +19,11 @@ package uk.gov.hmrc.customs.file.upload.controllers.actionBuilders
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{ActionRefiner, RequestHeader, Result}
 import uk.gov.hmrc.customs.api.common.controllers.ErrorResponse
+import uk.gov.hmrc.customs.file.upload.controllers.CustomHeaderNames.XEoriIdentifierHeaderName
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.{AuthorisedRequest, HasConversationId, HasRequest, ValidatedHeadersRequest}
-import uk.gov.hmrc.customs.file.upload.model.{AuthorisedAsCsp, BadgeIdentifier, Csp}
+import uk.gov.hmrc.customs.file.upload.model.{AuthorisedAsCsp, BadgeIdentifier, CspWithEori, Eori}
 import uk.gov.hmrc.customs.file.upload.services.{CustomsAuthService, FileUploadConfigService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.HeaderCarrierConverter
@@ -51,8 +52,6 @@ class AuthAction @Inject()(customsAuthService: CustomsAuthService,
                            fileUploadConfigService: FileUploadConfigService)
                           (implicit ec: ExecutionContext)
   extends ActionRefiner[ValidatedHeadersRequest, AuthorisedRequest] {
-
-  protected[this] def requestRetrievalsForEndpoint: Boolean = true
 
   override def refine[A](vhr: ValidatedHeadersRequest[A]): Future[Either[Result, AuthorisedRequest[A]]] = {
     implicit val implicitVhr: ValidatedHeadersRequest[A] = vhr
@@ -93,11 +92,18 @@ class AuthAction @Inject()(customsAuthService: CustomsAuthService,
 
   protected def eitherCspAuthData[A]()(implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, AuthorisedAsCsp] = {
 
-    eitherBadgeIdentifier.right.map(badgeId => Csp(badgeId))
+    for {
+      badgeId <- eitherBadgeIdentifier.right
+      eori <- eitherEori.right
+    } yield CspWithEori(badgeId, eori)
   }
 
   protected def eitherBadgeIdentifier[A](implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, BadgeIdentifier] = {
     headerValidator.eitherBadgeIdentifier
+  }
+
+  private def eitherEori[A](implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, Eori] = {
+    headerValidator.eoriMustBeValidAndPresent(XEoriIdentifierHeaderName)
   }
 
 }

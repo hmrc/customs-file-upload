@@ -46,7 +46,7 @@ class FileUploadNotificationService @Inject()(fileUploadMetadataRepo: FileUpload
 
   def sendMessage[T](callbackResponse: T, fileReference: FileReference, clientSubscriptionId: SubscriptionFieldsId)(implicit callbackToXml: CallbackToXmlNotification[T]): Future[Unit] = {
 
-    implicit val hasConversationId = new HasConversationId {
+    implicit val hasConversationId: HasConversationId = new HasConversationId {
       override val conversationId: ConversationId = ConversationId(fileReference.value)
     }
 
@@ -64,9 +64,7 @@ class FileUploadNotificationService @Inject()(fileUploadMetadataRepo: FileUpload
       metadata <- maybeMetadata
       batchFile <- metadata.files.find(bf => bf.reference == fileReference)
       cbFields <- batchFile.maybeCallbackFields
-    } yield (
-      cbFields.name
-    )
+    } yield cbFields.name
   }
 
 }

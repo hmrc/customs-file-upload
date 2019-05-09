@@ -27,7 +27,7 @@ import scala.concurrent.Future
 
 /** Action builder that validates headers.
   * <ol>
-  * <li/>Input - `CorrelationIdsRequest`
+  * <li/>Input - `ConversationIdRequest`
   * <li/>Output - `ValidatedHeadersRequest`
   * <li/>Error - 4XX Result if there is a header validation error. This terminates the action builder pipeline.
   * </ol>

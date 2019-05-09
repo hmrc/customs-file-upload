@@ -50,7 +50,7 @@ class FileUploadUpscanNotificationController @Inject()(notificationService: File
           }{js =>
             UploadedReadyCallbackBody.parse(js) match {
               case JsSuccess(callbackBody, _) =>
-                implicit val conversationId = conversationIdForLogging(callbackBody.reference.value)
+                implicit val conversationId: HasConversationId = conversationIdForLogging(callbackBody.reference.value)
                 callbackBody match {
                   case ready: UploadedReadyCallbackBody =>
                     cdsLogger.debug(s"Valid JSON request received with READY status. Body: ${Json.prettyPrint(js)} headers: ${request.headers}")

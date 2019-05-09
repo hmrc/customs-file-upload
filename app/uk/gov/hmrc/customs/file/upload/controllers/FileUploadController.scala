@@ -19,21 +19,22 @@ package uk.gov.hmrc.customs.file.upload.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.http.ContentTypes
 import play.api.mvc._
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthActionEoriHeader, ConversationIdAction, FileUploadPayloadValidationComposedAction}
+import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthAction, ConversationIdAction, FileUploadPayloadValidationComposedAction, ValidateAndExtractHeadersAction}
+import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
+import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ValidatedFileUploadPayloadRequest
 import uk.gov.hmrc.customs.file.upload.services.FileUploadBusinessService
-import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
-
 import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class FileUploadController @Inject()(val common: Common,
-                                     val fileUploadBusinessService: FileUploadBusinessService,
+class FileUploadController @Inject()(val conversationIdAction: ConversationIdAction,
+                                     val validateAndExtractHeadersAction: ValidateAndExtractHeadersAction,
+                                     val authAction: AuthAction,
                                      val fileUploadPayloadValidationComposedAction: FileUploadPayloadValidationComposedAction,
-                                     val conversationIdAction: ConversationIdAction,
-                                     val fileUploadAuthAction: AuthActionEoriHeader)
+                                     val fileUploadBusinessService: FileUploadBusinessService,
+                                     val logger: FileUploadLogger)
                                     (implicit ec: ExecutionContext)
   extends BaseController {
 
@@ -47,13 +48,12 @@ class FileUploadController @Inject()(val common: Common,
   def post(): Action[AnyContent] = (
     Action andThen
       conversationIdAction andThen
-      common.validateAndExtractHeadersAction andThen
-      fileUploadAuthAction andThen
+      validateAndExtractHeadersAction andThen
+      authAction andThen
       fileUploadPayloadValidationComposedAction
     ).async(bodyParser = xmlOrEmptyBody) {
 
     implicit validatedRequest: ValidatedFileUploadPayloadRequest[AnyContent] =>
-      val logger = common.logger
 
       logger.debug(s"File upload initiate request received. Payload=${validatedRequest.body.toString} headers=${validatedRequest.headers.headers}")
 

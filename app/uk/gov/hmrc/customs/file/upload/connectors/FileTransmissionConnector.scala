@@ -31,12 +31,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileTransmissionConnector @Inject()(http: HttpClient,
-                                          logger: FileUploadLogger,
-                                          config: FileUploadConfigService)
+                                          config: FileUploadConfigService,
+                                          logger: FileUploadLogger)
                                          (implicit ec: ExecutionContext) {
 
   private implicit val hc: HeaderCarrier = HeaderCarrier(
-    extraHeaders = Seq(ACCEPT -> JSON, CONTENT_TYPE -> JSON, USER_AGENT -> "customs-declarations")
+    extraHeaders = Seq(ACCEPT -> JSON, CONTENT_TYPE -> JSON, USER_AGENT -> "customs-file-upload")
   )
 
   def send[A](request: FileTransmission)(implicit hasConversationId: HasConversationId): Future[Unit] = {

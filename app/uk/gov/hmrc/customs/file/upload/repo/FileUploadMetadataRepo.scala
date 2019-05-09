@@ -49,7 +49,7 @@ class FileUploadMetadataMongoRepo @Inject()(reactiveMongoComponent: ReactiveMong
                                             logger: FileUploadLogger)
                                            (implicit ec: ExecutionContext)
   extends ReactiveRepository[FileUploadMetadata, BSONObjectID](
-    collectionName = "batchFileUploads",
+    collectionName = "file-upload-metadata",
     mongo = reactiveMongoComponent.mongoConnector.db,
     domainFormat = FileUploadMetadata.fileUploadMetadataJF
   ) with FileUploadMetadataRepo {

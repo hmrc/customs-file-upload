@@ -18,7 +18,7 @@ package uk.gov.hmrc.customs.file.upload.controllers.actionBuilders
 
 import javax.inject.{Inject, Singleton}
 import play.api.http.Status
-import play.api.mvc.{ActionRefiner, Result}
+import play.api.mvc.{ActionRefiner, AnyContent, Result}
 import play.mvc.Http.Status.FORBIDDEN
 import uk.gov.hmrc.customs.api.common.controllers.{ErrorResponse, HttpStatusCodeShortDescriptions, ResponseContents}
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
@@ -27,13 +27,69 @@ import uk.gov.hmrc.customs.file.upload.model.actionbuilders._
 import uk.gov.hmrc.customs.file.upload.model._
 import uk.gov.hmrc.customs.file.upload.services.{FileUploadConfigService, FileUploadXmlValidationService}
 
+import scala.collection.Seq
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.control.NonFatal
+import scala.xml.{NodeSeq, SAXException}
 
 @Singleton
 class FileUploadPayloadValidationAction @Inject()(fileUploadXmlValidationService: FileUploadXmlValidationService,
                                                   logger: FileUploadLogger)
                                                  (implicit ec: ExecutionContext)
-    extends PayloadValidationAction(fileUploadXmlValidationService, logger)
+  extends ActionRefiner[AuthorisedRequest, ValidatedPayloadRequest] {
+
+  override def refine[A](ar: AuthorisedRequest[A]): Future[Either[Result, ValidatedPayloadRequest[A]]] = {
+    implicit val implicitAr: AuthorisedRequest[A] = ar
+
+    validateXml
+  }
+
+  private def validateXml[A](implicit ar: AuthorisedRequest[A]): Future[Either[Result, ValidatedPayloadRequest[A]]] = {
+    lazy val errorMessage = "Request body does not contain a well-formed XML document."
+    lazy val errorNotWellFormed = ErrorResponse.errorBadRequest(errorMessage).XmlResult.withConversationId
+
+    def validate(xml: NodeSeq): Future[Either[Result, ValidatedPayloadRequest[A]]] =
+      fileUploadXmlValidationService.validate(xml).map{ _ =>
+        logger.debug("XML payload validated.")
+        Right(ar.toValidatedPayloadRequest(xml))
+      }
+        .recover {
+          case saxe: SAXException =>
+            val msg = "Payload did not pass validation against the schema."
+            logger.debug(msg, saxe)
+            logger.error(msg)
+            Left(ErrorResponse
+              .errorBadRequest("Payload is not valid according to schema")
+              .withErrors(xmlValidationErrors(saxe): _*).XmlResult.withConversationId)
+          case NonFatal(e) =>
+            val msg = "Error validating payload."
+            logger.debug(msg, e)
+            logger.error(msg)
+            Left(ErrorResponse.ErrorInternalServerError.XmlResult.withConversationId)
+        }
+
+    ar.asInstanceOf[AuthorisedRequest[AnyContent]].body.asXml.fold[Future[Either[Result, ValidatedPayloadRequest[A]]]]{
+      Future.successful(Left(errorNotWellFormed))
+    }{
+      xml => validate(xml)
+    }
+  }
+
+  private def xmlValidationErrors(saxe: SAXException): Seq[ResponseContents] = {
+    @annotation.tailrec
+    def loop(thr: Exception, acc: List[ResponseContents]): List[ResponseContents] = {
+      val newAcc = ResponseContents("xml_validation_error", thr.getMessage) :: acc
+      thr match {
+        case saxError: SAXException if Option(saxError.getException).isDefined => loop(saxError.getException, newAcc)
+        case _ => newAcc
+      }
+    }
+
+    loop(saxe, Nil)
+  }
+  
+  
+}
 
 class FileUploadPayloadValidationComposedAction @Inject()(val fileUploadPayloadValidationAction: FileUploadPayloadValidationAction,
                                                           val logger: FileUploadLogger,

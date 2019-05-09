@@ -25,9 +25,9 @@ import uk.gov.hmrc.customs.file.upload.services.{DateTimeService, UniqueIdsServi
 import scala.concurrent.Future
 
 @Singleton
-class ConversationIdAction @Inject()(val logger: FileUploadLogger,
-                                     val correlationIdService: UniqueIdsService,
-                                     val timeService: DateTimeService) extends ActionTransformer[Request, ConversationIdRequest] {
+class ConversationIdAction @Inject()(val correlationIdService: UniqueIdsService,
+                                     val timeService: DateTimeService,
+                                     val logger: FileUploadLogger) extends ActionTransformer[Request, ConversationIdRequest] {
 
   override def transform[A](request: Request[A]): Future[ConversationIdRequest[A]] = {
 
