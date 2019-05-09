@@ -25,7 +25,7 @@ import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders._
 import uk.gov.hmrc.customs.file.upload.model._
-import uk.gov.hmrc.customs.file.upload.services.{FileUploadConfigService, FileUploadXmlValidationService}
+import uk.gov.hmrc.customs.file.upload.services.{FileUploadConfigService, XmlValidationService}
 
 import scala.collection.Seq
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,7 +33,7 @@ import scala.util.control.NonFatal
 import scala.xml.{NodeSeq, SAXException}
 
 @Singleton
-class FileUploadPayloadValidationAction @Inject()(fileUploadXmlValidationService: FileUploadXmlValidationService,
+class FileUploadPayloadValidationAction @Inject()(xmlValidationService: XmlValidationService,
                                                   logger: FileUploadLogger)
                                                  (implicit ec: ExecutionContext)
   extends ActionRefiner[AuthorisedRequest, ValidatedPayloadRequest] {
@@ -49,7 +49,7 @@ class FileUploadPayloadValidationAction @Inject()(fileUploadXmlValidationService
     lazy val errorNotWellFormed = ErrorResponse.errorBadRequest(errorMessage).XmlResult.withConversationId
 
     def validate(xml: NodeSeq): Future[Either[Result, ValidatedPayloadRequest[A]]] =
-      fileUploadXmlValidationService.validate(xml).map{ _ =>
+      xmlValidationService.validate(xml).map{ _ =>
         logger.debug("XML payload validated.")
         Right(ar.toValidatedPayloadRequest(xml))
       }

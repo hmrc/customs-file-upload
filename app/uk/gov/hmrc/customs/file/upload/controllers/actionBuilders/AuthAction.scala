@@ -103,7 +103,7 @@ class AuthAction @Inject()(customsAuthService: CustomsAuthService,
   }
 
   private def eitherEori[A](implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, Eori] = {
-    headerValidator.eoriMustBeValidAndPresent(XEoriIdentifierHeaderName)
+    headerValidator.eoriMustBeValidAndPresent()
   }
 
 }

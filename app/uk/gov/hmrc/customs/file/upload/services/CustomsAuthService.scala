@@ -53,7 +53,7 @@ class CustomsAuthService @Inject()(override val authConnector: AuthConnector,
   */
   def authAsCsp()(implicit vhr: HasConversationId, hc: HeaderCarrier): Future[Either[ErrorResponse, IsCsp]] = {
     val eventualAuth =
-      authorised(Enrolment("write:customs-declaration") and AuthProviders(PrivilegedApplication)) {
+      authorised(Enrolment("write:customs-file-upload") and AuthProviders(PrivilegedApplication)) {
         Future.successful[Either[ErrorResponse, IsCsp]] {
           logger.debug("authorised as CSP without retrievals")
           Right(true)

@@ -24,19 +24,15 @@ import uk.gov.hmrc.customs.api.common.controllers.ErrorResponse
 import uk.gov.hmrc.customs.api.common.controllers.ErrorResponse._
 import uk.gov.hmrc.customs.file.upload.controllers.CustomHeaderNames._
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
-import uk.gov.hmrc.customs.file.upload.model.actionbuilders.{ConversationIdRequest, ExtractedHeaders, ExtractedHeadersImpl, HasConversationId, HasRequest}
-import uk.gov.hmrc.customs.file.upload.model.{ApiVersion, BadgeIdentifier, ClientId, Eori, VersionOne, VersionThree, VersionTwo}
+import uk.gov.hmrc.customs.file.upload.model.actionbuilders._
+import uk.gov.hmrc.customs.file.upload.model.{BadgeIdentifier, ClientId, Eori, VersionOne}
 
 import scala.util.matching.Regex
 
 @Singleton
 class HeaderValidator @Inject()(logger: FileUploadLogger) {
 
-  protected val versionsByAcceptHeader: Map[String, ApiVersion] = Map(
-    "application/vnd.hmrc.1.0+xml" -> VersionOne,
-    "application/vnd.hmrc.2.0+xml" -> VersionTwo,
-    "application/vnd.hmrc.3.0+xml" -> VersionThree
-  )
+  protected val validAcceptHeader: String = "application/vnd.hmrc.1.0+xml"
   private lazy val validContentTypeHeaders = Seq(MimeTypes.XML, MimeTypes.XML + ";charset=utf-8", MimeTypes.XML + "; charset=utf-8")
   private lazy val xClientIdRegex = "^\\S+$".r
 
@@ -45,12 +41,12 @@ class HeaderValidator @Inject()(logger: FileUploadLogger) {
 
   private lazy val EoriHeaderRegex: Regex = "(^[\\s]*$|^.{18,}$)".r
 
-  private def errorResponseEoriIdentifierHeaderMissing(eoriHeaderName: String) = errorBadRequest(s"$eoriHeaderName header is missing or invalid")
+  private def errorResponseEoriIdentifierHeaderMissing() = errorBadRequest(s"$XEoriIdentifierHeaderName header is missing or invalid")
 
   def validateHeaders[A](implicit conversationIdRequest: ConversationIdRequest[A]): Either[ErrorResponse, ExtractedHeaders] = {
     implicit val headers: Headers = conversationIdRequest.headers
 
-    def hasAccept = validateHeader(ACCEPT, versionsByAcceptHeader.keySet.contains(_), ErrorAcceptHeaderInvalid)
+    def hasAccept = validateHeader(ACCEPT, validAcceptHeader.equalsIgnoreCase, ErrorAcceptHeaderInvalid)
 
     def hasContentType = validateHeader(CONTENT_TYPE, s => validContentTypeHeaders.contains(s.toLowerCase()), ErrorContentTypeHeaderInvalid)
 
@@ -65,7 +61,7 @@ class HeaderValidator @Inject()(logger: FileUploadLogger) {
         s"\n$ACCEPT header passed validation: $acceptValue"
       + s"\n$CONTENT_TYPE header passed validation: $contentTypeValue"
       + s"\n$XClientIdHeaderName header passed validation: $xClientIdValue")
-      ExtractedHeadersImpl(versionsByAcceptHeader(acceptValue), ClientId(xClientIdValue))
+      ExtractedHeadersImpl(VersionOne, ClientId(xClientIdValue))
     }
     theResult
   }
@@ -104,19 +100,18 @@ class HeaderValidator @Inject()(logger: FileUploadLogger) {
     }
   }
 
-  def eoriMustBeValidAndPresent[A](eoriHeaderName: String)(implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, Eori] = {
-    val maybeEori: Option[String] = vhr.request.headers.toSimpleMap.get(eoriHeaderName)
+  def eoriMustBeValidAndPresent[A]()(implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, Eori] = {
+    val maybeEori: Option[String] = vhr.request.headers.toSimpleMap.get(XEoriIdentifierHeaderName)
 
     maybeEori.filter(EoriHeaderRegex.findFirstIn(_).isEmpty).map(e =>
       {
-        logger.info(s"$eoriHeaderName header passed validation: $e")
+        logger.info(s"$XEoriIdentifierHeaderName header passed validation: $e")
         Eori(e)
       }
     ).toRight{
-      logger.error(s"$eoriHeaderName header is invalid or not present for CSP ($maybeEori)")
-      errorResponseEoriIdentifierHeaderMissing(eoriHeaderName)
+      logger.error(s"$XEoriIdentifierHeaderName header is invalid or not present for CSP ($maybeEori)")
+      errorResponseEoriIdentifierHeaderMissing()
     }
   }
 
 }
-

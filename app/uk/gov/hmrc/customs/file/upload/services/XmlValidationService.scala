@@ -19,7 +19,7 @@ package uk.gov.hmrc.customs.file.upload.services
 import java.io.{FileNotFoundException, StringReader}
 import java.net.URL
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import javax.xml.XMLConstants
 import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
@@ -31,8 +31,11 @@ import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.{NodeSeq, SAXException}
 
-abstract class XmlValidationService @Inject()(val configuration: Configuration, val schemaPropertyName: String) {
+@Singleton
+class XmlValidationService @Inject()(val configuration: Configuration) {
 
+  private val schemaPropertyName = "xsd.locations.fileupload"
+  
   private lazy val schema: Schema = {
     def resourceUrl(resourcePath: String): URL = Option(getClass.getResource(resourcePath))
       .getOrElse(throw new FileNotFoundException(s"XML Schema resource file: $resourcePath"))

@@ -44,15 +44,7 @@ object ConversationId {
   implicit val reader: Reads[ConversationId] = Reads.of[UUID].map(new ConversationId(_))
 }
 
-case class Mrn(value: String) extends AnyVal {
-  override def toString: String = value.toString
-}
-
 case class CorrelationId(uuid: UUID) extends AnyVal {
-  override def toString: String = uuid.toString
-}
-
-case class DeclarationManagementInformationRequestId(uuid: UUID) extends AnyVal {
   override def toString: String = uuid.toString
 }
 
@@ -109,14 +101,6 @@ object VersionOne extends ApiVersion{
   override val value: String = "1.0"
   override val configPrefix: String = ""
 }
-object VersionTwo extends ApiVersion{
-  override val value: String = "2.0"
-  override val configPrefix: String = "v2."
-}
-object VersionThree extends ApiVersion{
-  override val value: String = "3.0"
-  override val configPrefix: String = "v3."
-}
 
 sealed trait AuthorisedAs {
 }
@@ -150,15 +134,3 @@ case class UpscanInitiateUploadRequest
 object UpscanInitiateResponsePayload {
   implicit val format: OFormat[UpscanInitiateResponsePayload] = Json.format[UpscanInitiateResponsePayload]
 }
-
-private object NotAvailable { val na = Some("NOT AVAILABLE") }
-
-case class DeclarationStatusResponse(declaration: Declaration)
-case class Declaration(versionNumber: Option[String] = NotAvailable.na, creationDate: Option[String] = NotAvailable.na, acceptanceDate: Option[String] = NotAvailable.na,  tradeMovementType: Option[String] = NotAvailable.na,  `type`: Option[String] = NotAvailable.na,  parties: Parties, goodsItemCount: Option[String] = NotAvailable.na,  packageCount: Option[String] = NotAvailable.na)
-case class Parties(partyIdentification: PartyIdentification)
-case class PartyIdentification(number: Option[String] = NotAvailable.na)
-
-object PartyIdentification { implicit val format: OFormat[PartyIdentification] = Json.format[PartyIdentification] }
-object Parties { implicit val format: OFormat[Parties] = Json.format[Parties] }
-object Declaration { implicit val format: OFormat[Declaration] = Json.format[Declaration] }
-object DeclarationStatusResponse { implicit val format: OFormat[DeclarationStatusResponse] = Json.format[DeclarationStatusResponse] }
