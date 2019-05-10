@@ -13,7 +13,7 @@
   "api": {
     "name": "Document Submission API",
     "description": "Allows traders to submit supporting documents for their declarations",
-    "context": "/customs/supporting-documentation",
+    "context": "customs/supporting-documentation",
     "versions": [
       {
         "version": "1.0",

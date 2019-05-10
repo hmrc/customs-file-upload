@@ -31,7 +31,7 @@ class ConversationIdAction @Inject()(val correlationIdService: UniqueIdsService,
 
   override def transform[A](request: Request[A]): Future[ConversationIdRequest[A]] = {
 
-    val r = ConversationIdRequest(correlationIdService.conversation, timeService.zonedDateTimeUtc, request)
+    val r = ConversationIdRequest(correlationIdService.conversation, request)
     logger.debugFull("In ConversationIdAction")(r)
 
     Future.successful(r)
