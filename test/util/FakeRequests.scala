@@ -17,16 +17,20 @@
 package util
 
 import play.api.http.HeaderNames.AUTHORIZATION
-import play.api.mvc.AnyContentAsText
+import play.api.mvc.{AnyContentAsText, AnyContentAsXml}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.POST
 import util.RequestHeaders._
 import util.TestData.{cspBearerToken, nonCspBearerToken}
-import util.TestXMLData.InvalidFileUploadXml
+import util.TestXMLData.{InvalidFileUploadXml, validFileUploadXml}
 
 object FakeRequests {
 
-  lazy val InvalidFileUploadRequest = FakeRequest()
+  lazy val ValidFileUploadV1Request = FakeRequest()
+    .withHeaders(ValidHeadersV1.toSeq: _*)
+    .withXmlBody(validFileUploadXml())
+
+  lazy val InvalidFileUploadRequest: FakeRequest[AnyContentAsXml] = FakeRequest()
     .withHeaders(ValidHeadersV1.toSeq: _*)
     .withXmlBody(InvalidFileUploadXml)
 

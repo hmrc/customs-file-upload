@@ -49,5 +49,18 @@ object TestXMLData {
       </File>
     </Files>
   </FileUploadRequest>
+  
+  val InvalidFileUploadXmlWithTwoErrors: Elem =   <FileUploadRequest
+  xmlns="hmrc:fileupload"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <DeclarationID foo="bar" >declarationId</DeclarationID>
+    <FileGroupSize>1</FileGroupSize>
+    <Files>
+      <File>
+        <FileSequenceNo>A</FileSequenceNo>
+        <DocumentType>document type 1</DocumentType>
+      </File>
+    </Files>
+  </FileUploadRequest>
 
 }

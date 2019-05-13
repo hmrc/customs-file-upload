@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.customs.file.upload.model
+package uk.gov.hmrc.customs.file.upload
 
-case class FileUploadConfig(apiSubscriptionFieldsBaseUrl: String,
-                            customsNotificationBaseBaseUrl: String,
-                            customsNotificationBearerToken: String,
-                            upscanInitiateUrl: String,
-                            upscanCallbackUrl: String,
-                            fileUploadCallbackUrl: String,
-                            fileGroupSizeMaximum: Int,
-                            fileTransmissionCallbackUrl: String,
-                            fileTransmissionBaseUrl: String)
+package object model {
+
+  type SeqOfHeader = Seq[(String, String)]
+
+}

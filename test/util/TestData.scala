@@ -59,8 +59,8 @@ object TestData {
 
   val clientSubscriptionIdString: String = "327d9145-4965-4d28-a2c5-39dedee50334"
 
-//  val fileUploadConfig = FileUploadConfig("upscan-initiate.url", "callback.url", "callback.url", 3, "fileTransmissionCallbackUrl", "fileTransmissionUrl")
-  val fileUploadConfig = FileUploadConfig("API_SUBSCRIPTION_FIELDS_URL", "CUSTOMS_NOTIFICATION_URL", "some-token", "UPSCAN_INITIATE_URL", "UPSCAN_URL_IGNORED", "UPSCAN_URL_IGNORED", 3, "fileTransmissionCallbackUrl",  "fileTransmissionUrl")
+  val TenMb = 10485760
+  val fileUploadConfig = FileUploadConfig("API_SUBSCRIPTION_FIELDS_URL", "CUSTOMS_NOTIFICATION_URL", "some-token", "UPSCAN_INITIATE_URL", "UPSCAN_URL_IGNORED", TenMb, "UPSCAN_URL_IGNORED", 3, "fileTransmissionCallbackUrl",  "fileTransmissionUrl")
 
   val validBadgeIdentifierValue = "BADGEID123"
   val invalidBadgeIdentifierValue = "INVALIDBADGEID123456789"

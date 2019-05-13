@@ -20,7 +20,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import uk.gov.hmrc.customs.api.common.controllers.ErrorResponse.{ErrorInternalServerError, errorBadRequest}
 import uk.gov.hmrc.customs.file.upload.controllers.CustomHeaderNames.{XBadgeIdentifierHeaderName, XEoriIdentifierHeaderName}
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthActionEoriHeader, HeaderValidator}
+import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthAction, HeaderValidator}
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.CspWithEori
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 import util.TestData._
 import util.{AuthConnectorStubbing, RequestHeaders}
 
-class FileUploadAuthActionSpec extends UnitSpec with MockitoSugar {
+class AuthActionSpec extends UnitSpec with MockitoSugar {
 
   private val errorResponseBadgeIdentifierHeaderMissing =
     errorBadRequest(s"$XBadgeIdentifierHeaderName header is missing or invalid")
@@ -61,11 +61,11 @@ class FileUploadAuthActionSpec extends UnitSpec with MockitoSugar {
     val mockDeclarationConfigService: FileUploadConfigService = mock[FileUploadConfigService]
     protected val customsAuthService = new CustomsAuthService(mockAuthConnector, mockLogger)
     protected val headerValidator = new HeaderValidator(mockLogger)
-    val fileUploadAuthAction = new AuthActionEoriHeader(customsAuthService, headerValidator, mockLogger, mockDeclarationConfigService)
+    val fileUploadAuthAction = new AuthAction(customsAuthService, headerValidator, mockLogger, mockDeclarationConfigService)
   }
 
   "AuthAction Builder " can {
-    "as CSP when NRS is disabled" should {
+    "as CSP" should {
       "authorise as CSP when authorised by auth API and badge identifier exists" in new SetUp {
         authoriseCsp()
 
@@ -145,7 +145,7 @@ class FileUploadAuthActionSpec extends UnitSpec with MockitoSugar {
         actual shouldBe Left(errorResponseEoriIdentifierHeaderMissing.XmlResult.withHeaders(RequestHeaders.X_CONVERSATION_ID_NAME -> conversationId.toString))
         verifyNonCspAuthorisationNotCalled
       }
-
+      
       "Return 401 response when authorised by auth API with eori too long" in new SetUp {
         authoriseCsp()
 
@@ -161,6 +161,15 @@ class FileUploadAuthActionSpec extends UnitSpec with MockitoSugar {
         private val actual = await(fileUploadAuthAction.refine(validatedHeadersRequestWithInvalidEoriInvalidChars))
 
         actual shouldBe Left(errorResponseEoriIdentifierHeaderMissing.XmlResult.withHeaders(RequestHeaders.X_CONVERSATION_ID_NAME -> conversationId.toString))
+        verifyNonCspAuthorisationNotCalled
+      }
+
+      "Return 401 response when authorised by auth API but both badge identifier and eori are invalid" in new SetUp {
+        authoriseCsp()
+
+        private val actual = await(fileUploadAuthAction.refine(validatedHeadersRequestWithInvalidBadgeIdEoriPair))
+
+        actual shouldBe Left(errorResponseBadgeIdentifierHeaderMissing.XmlResult.withHeaders(RequestHeaders.X_CONVERSATION_ID_NAME -> conversationId.toString))
         verifyNonCspAuthorisationNotCalled
       }
 

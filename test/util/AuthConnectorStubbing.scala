@@ -22,7 +22,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.auth.core.AuthProvider.{GovernmentGateway, PrivilegedApplication}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
-import uk.gov.hmrc.customs.file.upload.model.Eori
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -32,7 +31,6 @@ trait AuthConnectorStubbing extends UnitSpec with MockitoSugar {
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
   private val apiScope = "write:customs-file-upload"
   private val customsEnrolmentName = "HMRC-CUS-ORG"
-  private val eoriIdentifier = "EORINumber"
   private val cspAuthPredicate = Enrolment(apiScope) and AuthProviders(PrivilegedApplication)
   private val nonCspAuthPredicate = Enrolment(customsEnrolmentName) and AuthProviders(GovernmentGateway)
 
@@ -44,42 +42,6 @@ trait AuthConnectorStubbing extends UnitSpec with MockitoSugar {
   def authoriseCspError(): Unit = {
     when(mockAuthConnector.authorise(ameq(cspAuthPredicate), ameq(EmptyRetrieval))(any[HeaderCarrier], any[ExecutionContext]))
       .thenReturn(Future.failed(TestData.emulatedServiceFailure))
-  }
-
-  def unauthoriseCsp(authException: AuthorisationException = new InsufficientEnrolments): Unit = {
-    when(mockAuthConnector.authorise(ameq(cspAuthPredicate), ameq(EmptyRetrieval))(any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future.failed(authException))
-  }
-
-  def authoriseNonCsp(maybeEori: Option[Eori]): Unit = {
-    unauthoriseCsp()
-    val customsEnrolment = maybeEori.fold(ifEmpty = Enrolment(customsEnrolmentName)) { eori =>
-      Enrolment(customsEnrolmentName).withIdentifier(eoriIdentifier, eori.value)
-    }
-    when(mockAuthConnector.authorise(ameq(nonCspAuthPredicate), ameq(Retrievals.authorisedEnrolments))(any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Enrolments(Set(customsEnrolment)))
-  }
-
-  def authoriseNonCspButDontRetrieveCustomsEnrolment(): Unit = {
-    unauthoriseCsp()
-    when(mockAuthConnector.authorise(ameq(nonCspAuthPredicate), ameq(Retrievals.authorisedEnrolments))(any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Enrolments(Set.empty))
-  }
-
-  def unauthoriseNonCspOnly(authException: AuthorisationException = new InsufficientEnrolments): Unit = {
-    when(mockAuthConnector.authorise(ameq(nonCspAuthPredicate), ameq(Retrievals.authorisedEnrolments))(any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future.failed(authException))
-  }
-
-  def authoriseNonCspOnlyError(): Unit = {
-    when(mockAuthConnector.authorise(ameq(nonCspAuthPredicate), ameq(Retrievals.authorisedEnrolments))(any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future.failed(TestData.emulatedServiceFailure))
-  }
-
-
-  def verifyCspAuthorisationCalled(numberOfTimes: Int): Future[Unit] = {
-    verify(mockAuthConnector, times(numberOfTimes))
-      .authorise(ameq(cspAuthPredicate), ameq(EmptyRetrieval))(any[HeaderCarrier], any[ExecutionContext])
   }
 
   def verifyNonCspAuthorisationCalled(numberOfTimes: Int): Future[Enrolments] = {

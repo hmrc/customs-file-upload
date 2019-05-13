@@ -31,7 +31,7 @@ object ActionBuilderModelHelper {
   }
 
   implicit class CorrelationIdsRequestOps[A](val cir: ConversationIdRequest[A]) extends AnyVal {
-    def toValidatedHeadersRequest(eh: ExtractedHeaders): ValidatedHeadersRequest[A] = 
+    def toValidatedHeadersRequest(eh: ExtractedHeaders): ValidatedHeadersRequest[A] =
       ValidatedHeadersRequest(cir.conversationId, eh.requestedApiVersion, eh.clientId, cir.request)
   }
 
@@ -41,7 +41,7 @@ object ActionBuilderModelHelper {
 
     def toNonCspAuthorisedRequest(eori: Eori): AuthorisedRequest[A] = toAuthorisedRequest(NonCsp(eori))
 
-    def toAuthorisedRequest(authorisedAs: AuthorisedAs): AuthorisedRequest[A] = 
+    def toAuthorisedRequest(authorisedAs: AuthorisedAs): AuthorisedRequest[A] =
       AuthorisedRequest(vhr.conversationId, vhr.requestedApiVersion, vhr.clientId, authorisedAs, vhr.request)
   }
 

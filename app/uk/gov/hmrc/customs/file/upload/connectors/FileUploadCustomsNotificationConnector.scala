@@ -46,16 +46,16 @@ class FileUploadCustomsNotificationConnector @Inject()(http: HttpClient,
 
 
     (http.POSTString[HttpResponse](
-      config.fileUploadConfig.customsNotificationBaseBaseUrl,
+      config.fileUploadConfig.customsNotificationBaseUrl,
       XMLHeader + notification.payload.toString(),
       headers.toSeq
     ) map { _ =>
-      logger.info(s"[conversationId=${notification.conversationId}][clientSubscriptionId=${notification.clientSubscriptionId}]: notification sent successfully. url=${config.fileUploadConfig.customsNotificationBaseBaseUrl}")
+      logger.info(s"[conversationId=${notification.conversationId}][clientSubscriptionId=${notification.clientSubscriptionId}]: notification sent successfully. url=${config.fileUploadConfig.customsNotificationBaseUrl}")
       ()
     }).recoverWith {
       case httpError: HttpException => Future.failed(new RuntimeException(httpError))
       case e: Throwable =>
-        logger.error(s"[conversationId=${notification.conversationId}][clientSubscriptionId=${notification.clientSubscriptionId}]: Call to customs notification failed. url=${config.fileUploadConfig.customsNotificationBaseBaseUrl}")
+        logger.error(s"[conversationId=${notification.conversationId}][clientSubscriptionId=${notification.clientSubscriptionId}]: Call to customs notification failed. url=${config.fileUploadConfig.customsNotificationBaseUrl}")
         Future.failed(e)
     }
 

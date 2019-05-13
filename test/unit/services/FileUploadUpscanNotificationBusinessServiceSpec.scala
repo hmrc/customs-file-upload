@@ -31,7 +31,7 @@ import uk.gov.hmrc.customs.file.upload.repo.FileUploadMetadataRepo
 import uk.gov.hmrc.customs.file.upload.services.{FileUploadConfigService, FileUploadUpscanNotificationBusinessService}
 import uk.gov.hmrc.play.test.UnitSpec
 import util.ApiSubscriptionFieldsTestData.subscriptionFieldsId
-import util.TestData._
+import util.TestData.{TenMb, _}
 
 import scala.concurrent.Future
 
@@ -61,7 +61,17 @@ class FileUploadUpscanNotificationBusinessServiceSpec extends UnitSpec with Mock
     override val conversationId: ConversationId = ConversationId(FileReferenceOne.value)
   }
   private val fileGroupSizeMaximum = 5
-  private val fileUploadConfig = FileUploadConfig("API_SUBSCRIPTION_FIELDS_URL", "CUSTOMS_NOTIFICATION_URL", "some-token", "UPSCAN_INITIATE_URL", "UPSCAN_URL_IGNORED", "UPSCAN_URL_IGNORED", fileGroupSizeMaximum, fileTransmissionCallbackUrl, fileTransmissionServiceURL)
+  private val fileUploadConfig = FileUploadConfig(
+    "API_SUBSCRIPTION_FIELDS_URL",
+    "CUSTOMS_NOTIFICATION_URL",
+    "some-token",
+    "UPSCAN_INITIATE_URL",
+    "UPSCAN_URL_IGNORED",
+    TenMb,
+    "UPSCAN_URL_IGNORED",
+    fileGroupSizeMaximum,
+    fileTransmissionCallbackUrl,
+    fileTransmissionServiceURL)
 
   trait SetUp {
     protected val mockRepo = mock[FileUploadMetadataRepo]

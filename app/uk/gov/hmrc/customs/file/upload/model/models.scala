@@ -111,7 +111,7 @@ case class Csp(badgeIdentifier: BadgeIdentifier) extends AuthorisedAsCsp
 case class CspWithEori(badgeIdentifier: BadgeIdentifier, eori: Eori) extends AuthorisedAsCsp
 case class NonCsp(eori: Eori) extends AuthorisedAs
 
-case class UpscanInitiatePayload(callbackUrl: String)
+case class UpscanInitiatePayload(callbackUrl: String, maximumFileSize: Int)
 
 object UpscanInitiatePayload {
   implicit val format: OFormat[UpscanInitiatePayload] = Json.format[UpscanInitiatePayload]
