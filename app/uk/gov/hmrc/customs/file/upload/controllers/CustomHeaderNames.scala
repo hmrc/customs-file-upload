@@ -17,10 +17,10 @@
 package uk.gov.hmrc.customs.file.upload.controllers
 
 object CustomHeaderNames {
-  val XConversationIdHeaderName: String = "X-Conversation-ID"
-  val XCorrelationIdHeaderName: String = "X-Correlation-ID"
+  val XConversationIdHeaderName = "X-Conversation-ID"
+  val XCorrelationIdHeaderName = "X-Correlation-ID"
   val XClientIdHeaderName = "X-Client-ID"
-  val XBadgeIdentifierHeaderName: String = "X-Badge-Identifier"
+  val XBadgeIdentifierHeaderName = "X-Badge-Identifier"
   val Authorization = "Authorization"
   val XEoriIdentifierHeaderName = "X-EORI-Identifier"
 }

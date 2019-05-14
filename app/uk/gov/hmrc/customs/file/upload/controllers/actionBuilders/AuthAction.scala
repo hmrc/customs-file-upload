@@ -41,7 +41,7 @@ import scala.util.Left
   * <li/>401 if authorised as CSP but badge identifier not present for CSP
   * <li/>401 if authorised as NON CSP but enrolments does not contain an EORI.
   * <li/>401 if not authorised as CSP or NON CSP
-  * <li/>500 on any downstream errors it returns 500
+  * <li/>500 on any downstream errors a 500 is returned
   * </ul>
   * </ul>
   */

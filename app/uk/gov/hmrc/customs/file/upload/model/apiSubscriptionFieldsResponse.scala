@@ -22,11 +22,12 @@ import play.api.libs.json.{Format, Json}
 
 case class ApiSubscriptionFieldsResponse(fieldsId: UUID, fields: ApiSubscriptionFieldsResponseFields)
 
-case class ApiSubscriptionFieldsResponseFields(authenticatedEori: Option[String])
-
 object ApiSubscriptionFieldsResponse {
   implicit val format: Format[ApiSubscriptionFieldsResponse] = Json.format[ApiSubscriptionFieldsResponse]
 }
+
+
+case class ApiSubscriptionFieldsResponseFields(authenticatedEori: Option[String])
 
 object ApiSubscriptionFieldsResponseFields {
   implicit val format: Format[ApiSubscriptionFieldsResponseFields] = Json.format[ApiSubscriptionFieldsResponseFields]

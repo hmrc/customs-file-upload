@@ -91,6 +91,7 @@ class PayloadValidationAction @Inject()(xmlValidationService: XmlValidationServi
   
 }
 
+@Singleton
 class PayloadValidationComposedAction @Inject()(val payloadValidationAction: PayloadValidationAction,
                                                 val logger: FileUploadLogger,
                                                 val fileUploadConfigService: FileUploadConfigService)
