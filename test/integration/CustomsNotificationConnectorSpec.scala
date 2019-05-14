@@ -22,19 +22,22 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.{BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
-import uk.gov.hmrc.customs.file.upload.connectors.FileUploadCustomsNotificationConnector
+import uk.gov.hmrc.customs.file.upload.connectors.CustomsNotificationConnector
 import uk.gov.hmrc.customs.file.upload.services.FileUploadCustomsNotification
 import uk.gov.hmrc.http._
 import util.ApiSubscriptionFieldsTestData.subscriptionFieldsId
 import util.ExternalServicesConfig.{Host, Port}
 import util.TestData._
 import util.externalservices.CustomsNotificationService
-import util.{CustomsDeclarationsExternalServicesConfig, TestData}
+import util.{CustomsFileUploadExternalServicesConfig, TestData}
 
-class FileUploadNotificationConnectorSpec extends IntegrationTestSpec with GuiceOneAppPerSuite with MockitoSugar
-  with BeforeAndAfterAll with CustomsNotificationService {
+class CustomsNotificationConnectorSpec extends IntegrationTestSpec
+  with GuiceOneAppPerSuite
+  with MockitoSugar
+  with BeforeAndAfterAll
+  with CustomsNotificationService {
 
-  private lazy val connector = app.injector.instanceOf[FileUploadCustomsNotificationConnector]
+  private lazy val connector = app.injector.instanceOf[CustomsNotificationConnector]
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -61,8 +64,8 @@ class FileUploadNotificationConnectorSpec extends IntegrationTestSpec with Guice
       "auditing.enabled" -> false,
       "microservice.services.customs-notification.host" -> Host,
       "microservice.services.customs-notification.port" -> Port,
-      "microservice.services.customs-notification.context" -> CustomsDeclarationsExternalServicesConfig.CustomsNotificationContext,
-      "microservice.services.customs-notification.bearer-token" -> CustomsDeclarationsExternalServicesConfig.CustomsNotificationAuthHeaderValue
+      "microservice.services.customs-notification.context" -> CustomsFileUploadExternalServicesConfig.CustomsNotificationContext,
+      "microservice.services.customs-notification.bearer-token" -> CustomsFileUploadExternalServicesConfig.CustomsNotificationAuthHeaderValue
     )).build()
 
   "FileUploadCustomsNotificationConnector" should {

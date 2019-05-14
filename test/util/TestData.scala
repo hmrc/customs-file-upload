@@ -22,8 +22,6 @@ import java.util.UUID
 import java.util.UUID.fromString
 
 import com.google.inject.AbstractModule
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone.UTC
 import org.scalatestplus.mockito.MockitoSugar.mock
 import play.api.http.HeaderNames._
 import play.api.http.MimeTypes
@@ -32,12 +30,10 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsXml
 import play.api.test.FakeRequest
 import play.api.test.Helpers.CONTENT_TYPE
-import uk.gov.hmrc.customs.api.common.logging.CdsLogger
 import uk.gov.hmrc.customs.file.upload.model._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders._
 import uk.gov.hmrc.customs.file.upload.services.{UniqueIdsService, UuidService}
-import unit.logging.StubFileUploadLogger
 import util.ApiSubscriptionFieldsTestData.subscriptionFieldsId
 import util.TestData.declarantEori
 
@@ -52,28 +48,19 @@ object TestData {
   val correlationIdUuid: UUID = fromString(correlationIdValue)
   val correlationId = CorrelationId(correlationIdUuid)
 
-  val date: DateTime = DateTime.parse("2018-09-11T10:28:54.128Z")
-
-  val subscriptionFieldsIdString: String = "b82f31c6-2239-4253-b6f5-ed75e37ab7a5"
-  val subscriptionFieldsIdUuid: UUID = fromString("b82f31c6-2239-4253-b6f5-ed75e37ab7a5")
-
   val clientSubscriptionIdString: String = "327d9145-4965-4d28-a2c5-39dedee50334"
 
   val TenMb = 10485760
   val fileUploadConfig = FileUploadConfig("API_SUBSCRIPTION_FIELDS_URL", "CUSTOMS_NOTIFICATION_URL", "some-token", "UPSCAN_INITIATE_URL", "UPSCAN_URL_IGNORED", TenMb, "UPSCAN_URL_IGNORED", 3, "fileTransmissionCallbackUrl",  "fileTransmissionUrl")
 
   val validBadgeIdentifierValue = "BADGEID123"
-  val invalidBadgeIdentifierValue = "INVALIDBADGEID123456789"
-  val invalidBadgeIdentifier: BadgeIdentifier = BadgeIdentifier(invalidBadgeIdentifierValue)
   val badgeIdentifier: BadgeIdentifier = BadgeIdentifier(validBadgeIdentifierValue)
 
   val cspBearerToken = "CSP-Bearer-Token"
   val nonCspBearerToken = "Software-House-Bearer-Token"
-  val invalidBearerToken = "InvalidBearerToken"
 
   val declarantEoriValue = "ZZ123456789000"
   val declarantEori = Eori(declarantEoriValue)
-  val upscanInitiateReference = "11370e18-6e24-453e-b45a-76d3e32ea33d"
   val ONE = 1
   val TWO = 2
   val THREE = 3
@@ -111,17 +98,10 @@ object TestData {
 
   val TWENTY_FIVE = 25
 
-  val CURRENT_TIME_IN_MILLIS = 1530442800000L
-  val PREVIOUS_TIME_IN_MILLIS = 1530464400000L
-  val currentLoginTime: DateTime = new DateTime(CURRENT_TIME_IN_MILLIS, UTC)
-  val previousLoginTime: DateTime = new DateTime(PREVIOUS_TIME_IN_MILLIS, UTC)
-
   type EmulatedServiceFailure = UnsupportedOperationException
   val emulatedServiceFailure = new EmulatedServiceFailure("Emulated service failure.")
 
   lazy val mockUuidService: UuidService = mock[UuidService]
-
-  lazy val stubDeclarationsLogger = new StubFileUploadLogger(mock[CdsLogger])
 
   object TestModule extends AbstractModule {
     def configure(): Unit = {
@@ -141,33 +121,21 @@ object TestData {
   val TestFakeRequest: FakeRequest[AnyContentAsXml] = FakeRequest().withXmlBody(TestXmlPayload).withHeaders(("Authorization", "bearer-token"))
   val TestFakeRequestWithBadgeIdAndNoEori: FakeRequest[AnyContentAsXml] = FakeRequest().withXmlBody(TestXmlPayload).withHeaders(("Authorization", "bearer-token"), ("X-Badge-Identifier", badgeIdentifier.value))
   val TestFakeRequestWithEoriAndNoBadgeId: FakeRequest[AnyContentAsXml] = FakeRequest().withXmlBody(TestXmlPayload).withHeaders(("Authorization", "bearer-token"), ("X-EORI-Identifier", declarantEori.value))
-  val TestFakeRequestMultipleHeaderValues: FakeRequest[AnyContentAsXml] = FakeRequest().withXmlBody(TestXmlPayload).withHeaders(("Authorization", "bearer-token"), ("Accept", "ABC"), ("Accept", "DEF"))
-
-  def testFakeRequestWithBadgeId(badgeIdString: String = badgeIdentifier.value): FakeRequest[AnyContentAsXml] =
-    FakeRequest().withXmlBody(TestXmlPayload).withHeaders(RequestHeaders.X_BADGE_IDENTIFIER_NAME -> badgeIdString)
 
   def testFakeRequestWithBadgeIdEoriPair(badgeIdString: String = badgeIdentifier.value, eoriString: String = declarantEori.value): FakeRequest[AnyContentAsXml] =
     FakeRequest().withXmlBody(TestXmlPayload).withHeaders(RequestHeaders.X_BADGE_IDENTIFIER_NAME -> badgeIdString, RequestHeaders.X_EORI_IDENTIFIER_NAME -> eoriString)
 
-  def testFakeRequestWithHeader(header: String, headerValue: String): FakeRequest[AnyContentAsXml] =
-    FakeRequest().withXmlBody(TestXmlPayload).withHeaders(header -> headerValue)
-
   val TestConversationIdRequest = ConversationIdRequest(conversationId, TestFakeRequest)
   val TestConversationIdRequestWithBadgeIdAndNoEori = ConversationIdRequest(conversationId, TestFakeRequestWithBadgeIdAndNoEori)
   val TestConversationIdRequestWithEoriAndNoBadgeId = ConversationIdRequest(conversationId, TestFakeRequestWithEoriAndNoBadgeId)
-  val TestConversationIdRequestMultipleHeaderValues = ConversationIdRequest(conversationId, TestFakeRequestMultipleHeaderValues)
   val TestExtractedHeaders = ExtractedHeadersImpl(VersionOne, ApiSubscriptionFieldsTestData.clientId)
   val TestValidatedHeadersRequest: ValidatedHeadersRequest[AnyContentAsXml] = TestConversationIdRequest.toValidatedHeadersRequest(TestExtractedHeaders)
 
-  val TestValidatedHeadersRequestMultipleHeaderValues: ValidatedHeadersRequest[AnyContentAsXml] = TestConversationIdRequestMultipleHeaderValues.toValidatedHeadersRequest(TestExtractedHeaders)
   val TestCspAuthorisedRequest: AuthorisedRequest[AnyContentAsXml] = TestValidatedHeadersRequest.toCspAuthorisedRequest(Csp(badgeIdentifier))
   val TestValidatedHeadersRequestNoBadge: ValidatedHeadersRequest[AnyContentAsXml] = TestConversationIdRequest.toValidatedHeadersRequest(TestExtractedHeaders)
   val TestValidatedHeadersRequestWithBadgeIdAndNoEori: ValidatedHeadersRequest[AnyContentAsXml] = TestConversationIdRequestWithBadgeIdAndNoEori.toValidatedHeadersRequest(TestExtractedHeaders)
   val TestValidatedHeadersRequestWithEoriAndNoBadgeId: ValidatedHeadersRequest[AnyContentAsXml] = TestConversationIdRequestWithEoriAndNoBadgeId.toValidatedHeadersRequest(TestExtractedHeaders)
   val TestCspValidatedPayloadRequest: ValidatedPayloadRequest[AnyContentAsXml] = TestValidatedHeadersRequest.toCspAuthorisedRequest(Csp(badgeIdentifier)).toValidatedPayloadRequest(xmlBody = TestXmlPayload)
-  val TestCspWithEoriValidatedPayloadRequest: ValidatedPayloadRequest[AnyContentAsXml] = TestValidatedHeadersRequest.toCspAuthorisedRequest(CspWithEori(badgeIdentifier, declarantEori)).toValidatedPayloadRequest(xmlBody = TestXmlPayload)
-  val TestCspValidatedPayloadRequestMultipleHeaderValues: ValidatedPayloadRequest[AnyContentAsXml] = TestValidatedHeadersRequestMultipleHeaderValues.toCspAuthorisedRequest(Csp(badgeIdentifier)).toValidatedPayloadRequest(xmlBody = TestXmlPayload)
-  val TestNonCspValidatedPayloadRequest: ValidatedPayloadRequest[AnyContentAsXml] = TestValidatedHeadersRequest.toNonCspAuthorisedRequest(declarantEori).toValidatedPayloadRequest(xmlBody = TestXmlPayload)
 
   val BatchIdOne = BatchId(fromString("48400000-8cf0-11bd-b23e-10b96e4ef001"))
   val BatchIdTwo = BatchId(fromString("48400000-8cf0-11bd-b23e-10b96e4ef002"))
@@ -187,7 +155,6 @@ object TestData {
     inboundLocation = new URL("https://a.b.com"), sequenceNumber = FileSequenceNo(2), size = 1, documentType = Some(DocumentType("Document Type 2")))
   val BatchFileThree = BatchFile(reference = FileReferenceThree, Some(CallbackFieldsThree),
     inboundLocation = new URL("https://a.b.com"), sequenceNumber = FileSequenceNo(3), size = 1, documentType = Some(DocumentType("Document Type 3")))
-  val BatchFileOneNoCallbackFields: BatchFile = BatchFileOne.copy(maybeCallbackFields = None)
   val FileMetadataWithFileOne = FileUploadMetadata(DeclarationId("1"), Eori("123"), csId = subscriptionFieldsId, BatchIdOne, fileCount = 1, Seq(
     BatchFileOne
   ))
@@ -197,37 +164,27 @@ object TestData {
   val FileMetadataWithFilesOneAndThree = FileUploadMetadata(DeclarationId("3"), Eori("123"), csId = subscriptionFieldsId, BatchIdThree, fileCount = 2, Seq(
     BatchFileOne, BatchFileThree
   ))
-  val FileMetadataWithFileOneWithNoCallbackFieldsAndThree = FileUploadMetadata(DeclarationId("3"), Eori("123"), csId = subscriptionFieldsId, BatchIdOne, fileCount = 2, Seq(
-    BatchFileOneNoCallbackFields, BatchFileThree
-  ))
 
 }
 
 object RequestHeaders {
 
   val X_CONVERSATION_ID_NAME = "X-Conversation-ID"
-  lazy val X_CONVERSATION_ID_HEADER: (String, String) = X_CONVERSATION_ID_NAME -> TestData.conversationId.toString
 
   val X_BADGE_IDENTIFIER_NAME = "X-Badge-Identifier"
   lazy val X_BADGE_IDENTIFIER_HEADER: (String, String) = X_BADGE_IDENTIFIER_NAME -> TestData.badgeIdentifier.value
-  lazy val X_BADGE_IDENTIFIER_HEADER_INVALID_TOO_LONG: (String, String) = X_BADGE_IDENTIFIER_NAME -> TestData.invalidBadgeIdentifierValue
-  val X_BADGE_IDENTIFIER_HEADER_INVALID_CHARS: (String, String) = X_BADGE_IDENTIFIER_NAME -> "Invalid^&&("
-  val X_BADGE_IDENTIFIER_HEADER_INVALID_TOO_SHORT: (String, String) = X_BADGE_IDENTIFIER_NAME -> "12345"
-  val X_BADGE_IDENTIFIER_HEADER_INVALID_LOWERCASE: (String, String) = X_BADGE_IDENTIFIER_NAME -> "BadgeId123"
-
+   
   val X_CLIENT_ID_NAME = "X-Client-ID"
   val X_CLIENT_ID_HEADER: (String, String) = X_CLIENT_ID_NAME -> ApiSubscriptionFieldsTestData.xClientId
   val X_CLIENT_ID_HEADER_INVALID: (String, String) = X_CLIENT_ID_NAME -> "This is not a UUID"
 
   val X_EORI_IDENTIFIER_NAME = "X-EORI-Identifier"
-  val X_EORI_IDENTIFIER_HEADER: (String, String) = X_EORI_IDENTIFIER_NAME -> declarantEori.value
 
   val X_SUBMITTER_IDENTIFIER_NAME = "X-Submitter-Identifier"
   val X_SUBMITTER_IDENTIFIER_HEADER: (String, String) = X_SUBMITTER_IDENTIFIER_NAME -> declarantEori.value
 
   val CONTENT_TYPE_HEADER: (String, String) = CONTENT_TYPE -> MimeTypes.XML
   val CONTENT_TYPE_CHARSET_VALUE: String = s"${MimeTypes.XML}; charset=UTF-8"
-  val CONTENT_TYPE_HEADER_CHARSET: (String, String) = CONTENT_TYPE -> CONTENT_TYPE_CHARSET_VALUE
   val CONTENT_TYPE_HEADER_INVALID: (String, String) = CONTENT_TYPE -> "somethinginvalid"
 
   val ACCEPT_HMRC_XML_V1_VALUE = "application/vnd.hmrc.1.0+xml"

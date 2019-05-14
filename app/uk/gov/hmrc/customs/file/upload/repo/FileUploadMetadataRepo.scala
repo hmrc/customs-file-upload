@@ -38,8 +38,6 @@ trait FileUploadMetadataRepo {
 
   def fetch(reference: FileReference)(implicit r: HasConversationId): Future[Option[FileUploadMetadata]]
 
-  def delete(clientNotification: FileUploadMetadata)(implicit r: HasConversationId): Future[Unit]
-
   def update(csId: SubscriptionFieldsId, reference: FileReference, callbackFields: CallbackFields)(implicit r: HasConversationId): Future[Option[FileUploadMetadata]]
 }
 
@@ -58,11 +56,6 @@ class FileUploadMetadataMongoRepo @Inject()(reactiveMongoComponent: ReactiveMong
 
   override def indexes: Seq[Index] = Seq(
     Index(
-      key = Seq("batchId" -> IndexType.Ascending),
-      name = Some("batch-id"),
-      unique = true
-    ),
-    Index(
       key = Seq("files.reference" -> IndexType.Ascending, "csId" -> IndexType.Ascending),
       name = Some("csId-and-file-reference"),
       unique = true
@@ -73,7 +66,7 @@ class FileUploadMetadataMongoRepo @Inject()(reactiveMongoComponent: ReactiveMong
     logger.debug(s"saving fileUploadMetadata: $fileUploadMetadata")
     lazy val errorMsg = s"File meta data not inserted for $fileUploadMetadata"
 
-    collection.insert(fileUploadMetadata).map {
+    collection.insert(ordered = false).one(fileUploadMetadata).map {
       writeResult => errorHandler.handleSaveError(writeResult, errorMsg)
     }
   }
@@ -83,14 +76,6 @@ class FileUploadMetadataMongoRepo @Inject()(reactiveMongoComponent: ReactiveMong
 
     val selector = "files.reference" -> toJsFieldJsValueWrapper(reference)
     find(selector).map (_.headOption)
-  }
-
-  override def delete(fileUploadMetadata: FileUploadMetadata)(implicit r: HasConversationId): Future[Unit] = {
-    logger.debug(s"deleting fileUploadMetadata: $fileUploadMetadata")
-
-    val selector = "batchId" -> toJsFieldJsValueWrapper(fileUploadMetadata.batchId)
-    lazy val errorMsg = s"Could not delete entity for selector: $selector"
-    remove(selector).map(errorHandler.handleDeleteError(_, errorMsg))
   }
 
   def update(csId: SubscriptionFieldsId, reference: FileReference, cf: CallbackFields)(implicit r: HasConversationId): Future[Option[FileUploadMetadata]] = {

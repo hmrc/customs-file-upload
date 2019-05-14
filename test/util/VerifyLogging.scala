@@ -23,15 +23,15 @@ import util.MockitoPassByNameHelper.PassByNameVerifier
 
 object VerifyLogging {
 
-  def verifyDeclarationsLoggerError(message: String)(implicit logger: FileUploadLogger): Unit = {
-    verifyDeclarationsLogger("error", message)
+  def verifyFileUploadLoggerError(message: String)(implicit logger: FileUploadLogger): Unit = {
+    verifyFileUploadLogger("error", message)
   }
 
-  def verifyDeclarationsLoggerWarn(message: String)(implicit logger: FileUploadLogger): Unit = {
-    verifyDeclarationsLogger("warn", message)
+  def verifyFileUploadLoggerWarn(message: String)(implicit logger: FileUploadLogger): Unit = {
+    verifyFileUploadLogger("warn", message)
   }
 
-  private def verifyDeclarationsLogger(method: String, message: String)(implicit logger: FileUploadLogger): Unit = {
+  private def verifyFileUploadLogger(method: String, message: String)(implicit logger: FileUploadLogger): Unit = {
     PassByNameVerifier(logger, method)
       .withByNameParam(message)
       .withParamMatcher(any[HasConversationId])

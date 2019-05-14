@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.customs.file.upload.model.FileTransmission
-import util.CustomsDeclarationsExternalServicesConfig._
+import util.CustomsFileUploadExternalServicesConfig._
 import util.WireMockRunner
 
 import scala.collection.JavaConverters._

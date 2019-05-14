@@ -38,9 +38,9 @@ class UpscanInitiateConnectorSpec extends UnitSpec with MockitoSugar with Before
 
   private val mockWsPost = mock[HttpClient]
   private val mockLogger = mock[FileUploadLogger]
-  private val mockDeclarationsConfigService = mock[FileUploadConfigService]
+  private val mockFileUploadConfigService = mock[FileUploadConfigService]
 
-  private val connector = new UpscanInitiateConnector(mockWsPost, mockLogger, mockDeclarationsConfigService)
+  private val connector = new UpscanInitiateConnector(mockWsPost, mockLogger, mockFileUploadConfigService)
 
   private implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -51,7 +51,7 @@ class UpscanInitiateConnectorSpec extends UnitSpec with MockitoSugar with Before
 
   override protected def beforeEach() {
     reset(mockWsPost, mockLogger)
-    when(mockDeclarationsConfigService.fileUploadConfig).thenReturn(fileUploadConfig)
+    when(mockFileUploadConfigService.fileUploadConfig).thenReturn(fileUploadConfig)
   }
 
   "UpscanInitiateConnector" can {

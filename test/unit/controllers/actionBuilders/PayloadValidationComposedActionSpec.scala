@@ -23,7 +23,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.AnyContentAsXml
 import play.api.test.FakeRequest
 import uk.gov.hmrc.customs.api.common.controllers.{ErrorResponse, ResponseContents}
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{FileUploadPayloadValidationAction, FileUploadPayloadValidationComposedAction}
+import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{PayloadValidationAction, PayloadValidationComposedAction}
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.{AuthorisedRequest, ValidatedPayloadRequest, _}
@@ -38,14 +38,14 @@ import scala.concurrent.Future
 import scala.xml.Elem
 
 
-class FileUploadPayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
+class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
 
   trait SetUp {
     val mockLogger: FileUploadLogger = mock[FileUploadLogger]
-    val mockFileUploadPayloadValidationAction: FileUploadPayloadValidationAction = mock[FileUploadPayloadValidationAction]
+    val mockFileUploadPayloadValidationAction: PayloadValidationAction = mock[PayloadValidationAction]
     val mockFileUploadConfigService: FileUploadConfigService = mock[FileUploadConfigService]
     when(mockFileUploadConfigService.fileUploadConfig).thenReturn(fileUploadConfig)
-    val action: FileUploadPayloadValidationComposedAction = new FileUploadPayloadValidationComposedAction(mockFileUploadPayloadValidationAction, mockLogger, mockFileUploadConfigService)
+    val action: PayloadValidationComposedAction = new PayloadValidationComposedAction(mockFileUploadPayloadValidationAction, mockLogger, mockFileUploadConfigService)
   }
 
   "FileUploadPayloadValidationComposedAction" should {

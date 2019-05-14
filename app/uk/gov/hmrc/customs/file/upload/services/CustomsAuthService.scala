@@ -55,7 +55,7 @@ class CustomsAuthService @Inject()(override val authConnector: AuthConnector,
     val eventualAuth =
       authorised(Enrolment("write:customs-file-upload") and AuthProviders(PrivilegedApplication)) {
         Future.successful[Either[ErrorResponse, IsCsp]] {
-          logger.debug("authorised as CSP without retrievals")
+          logger.debug("authorised as CSP")
           Right(true)
         }
       }

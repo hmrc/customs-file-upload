@@ -20,7 +20,7 @@ import java.util.UUID
 
 import com.typesafe.config.{Config, ConfigFactory}
 import uk.gov.hmrc.customs.file.upload.model._
-import util.CustomsDeclarationsExternalServicesConfig.ApiSubscriptionFieldsContext
+import util.CustomsFileUploadExternalServicesConfig.ApiSubscriptionFieldsContext
 import util.ExternalServicesConfig.{Host, Port}
 import util.TestData.declarantEoriValue
 

@@ -31,12 +31,12 @@ import uk.gov.hmrc.play.bootstrap.controller.BaseController
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-class FileUploadUpscanNotificationController @Inject()(notificationService: FileUploadNotificationService,
-                                                       toXmlNotification: UpscanNotificationCallbackToXmlNotification,
-                                                       errorToXmlNotification: InternalErrorXmlNotification,
-                                                       businessService: FileUploadUpscanNotificationBusinessService,
-                                                       cdsLogger: CdsLogger)
-                                                      (implicit ec: ExecutionContext) extends BaseController {
+class UpscanNotificationController @Inject()(notificationService: FileUploadNotificationService,
+                                             toXmlNotification: UpscanNotificationCallbackToXmlNotification,
+                                             errorToXmlNotification: InternalErrorXmlNotification,
+                                             businessService: FileUploadUpscanNotificationBusinessService,
+                                             cdsLogger: CdsLogger)
+                                            (implicit ec: ExecutionContext) extends BaseController {
 
   def post(clientSubscriptionIdString: String): Action[AnyContent] = Action.async { implicit request =>
 

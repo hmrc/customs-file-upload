@@ -25,7 +25,9 @@ import uk.gov.hmrc.customs.api.common.domain.Registration
 import util.{ExternalServicesConfig, RegistrationService}
 
 class ServiceLocatorRegistrationSpec extends MixedPlaySpec
-  with BeforeAndAfterEach with BeforeAndAfterAll with RegistrationService {
+  with BeforeAndAfterEach
+  with BeforeAndAfterAll
+  with RegistrationService {
 
   private val expectedRegistration = Registration(
     "customs-file-upload",

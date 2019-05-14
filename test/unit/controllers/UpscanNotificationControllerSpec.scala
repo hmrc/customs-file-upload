@@ -30,7 +30,7 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{contentAsString, _}
 import uk.gov.hmrc.customs.api.common.config.ServicesConfig
-import uk.gov.hmrc.customs.file.upload.controllers.FileUploadUpscanNotificationController
+import uk.gov.hmrc.customs.file.upload.controllers.UpscanNotificationController
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.HasConversationId
 import uk.gov.hmrc.customs.file.upload.model._
 import uk.gov.hmrc.customs.file.upload.services.{FileUploadNotificationService, FileUploadUpscanNotificationBusinessService, InternalErrorXmlNotification, UpscanNotificationCallbackToXmlNotification}
@@ -41,14 +41,14 @@ import util.UpscanNotifyTestData._
 
 import scala.concurrent.Future
 
-class FileUploadUpscanNotificationControllerSpec extends PlaySpec with MockitoSugar with Eventually {
+class UpscanNotificationControllerSpec extends PlaySpec with MockitoSugar with Eventually {
 
   trait SetUp {
     val mockNotificationService: FileUploadNotificationService = mock[FileUploadNotificationService]
     val mockToXmlNotification: UpscanNotificationCallbackToXmlNotification = mock[UpscanNotificationCallbackToXmlNotification]
     val mockErrorToXmlNotification: InternalErrorXmlNotification = mock[InternalErrorXmlNotification]
     val mockBusinessService: FileUploadUpscanNotificationBusinessService = mock[FileUploadUpscanNotificationBusinessService]
-    val controller = new FileUploadUpscanNotificationController(
+    val controller = new UpscanNotificationController(
       mockNotificationService,
       mockToXmlNotification,
       mockErrorToXmlNotification,

@@ -26,7 +26,7 @@ import util.TestXMLData.{InvalidFileUploadXml, validFileUploadXml}
 
 object FakeRequests {
 
-  lazy val ValidFileUploadV1Request = FakeRequest()
+  lazy val ValidFileUploadV1Request: FakeRequest[AnyContentAsXml] = FakeRequest()
     .withHeaders(ValidHeadersV1.toSeq: _*)
     .withXmlBody(validFileUploadXml())
 

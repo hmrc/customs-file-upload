@@ -27,10 +27,10 @@ import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileUploadCustomsNotificationConnector @Inject()(http: HttpClient,
-                                                       logger: CdsLogger,
-                                                       config: FileUploadConfigService)
-                                                      (implicit ec: ExecutionContext) {
+class CustomsNotificationConnector @Inject()(http: HttpClient,
+                                             logger: CdsLogger,
+                                             config: FileUploadConfigService)
+                                            (implicit ec: ExecutionContext) {
 
   private implicit val hc = HeaderCarrier()
   private val XMLHeader = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>"""

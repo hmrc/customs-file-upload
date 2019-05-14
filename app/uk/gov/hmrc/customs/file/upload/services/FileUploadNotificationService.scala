@@ -20,7 +20,7 @@ import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.customs.api.common.logging.CdsLogger
-import uk.gov.hmrc.customs.file.upload.connectors.FileUploadCustomsNotificationConnector
+import uk.gov.hmrc.customs.file.upload.connectors.CustomsNotificationConnector
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.HasConversationId
 import uk.gov.hmrc.customs.file.upload.model.{ConversationId, FileReference, FileUploadMetadata, SubscriptionFieldsId}
 import uk.gov.hmrc.customs.file.upload.repo.FileUploadMetadataRepo
@@ -40,7 +40,7 @@ trait CallbackToXmlNotification[A] {
 */
 @Singleton
 class FileUploadNotificationService @Inject()(fileUploadMetadataRepo: FileUploadMetadataRepo,
-                                              notificationConnector: FileUploadCustomsNotificationConnector,
+                                              notificationConnector: CustomsNotificationConnector,
                                               logger: CdsLogger)
                                              (implicit ec: ExecutionContext) {
 

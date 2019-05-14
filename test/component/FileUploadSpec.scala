@@ -31,7 +31,7 @@ import util.{AuditService, TestData}
 
 import scala.concurrent.Future
 
-class FileUploadSpec extends ComponentTestSpec with ExpectedTestResponses
+class FileUploadSpec extends ComponentTestSpec
   with Matchers
   with OptionValues
   with BeforeAndAfterAll
@@ -58,7 +58,22 @@ class FileUploadSpec extends ComponentTestSpec with ExpectedTestResponses
     stopMockServer()
   }
 
-  feature("Valid request is processed correctly") {
+  private val MalformedXmlBodyError: String  =
+    """<?xml version="1.0" encoding="UTF-8"?>
+      |<errorResponse>
+      |  <code>BAD_REQUEST</code>
+      |  <message>Request body does not contain a well-formed XML document.</message>
+      |</errorResponse>
+    """.stripMargin
+
+  private val UnauthorisedRequestError: String =
+    """<errorResponse>
+      |  <code>UNAUTHORIZED</code>
+      |  <message>Unauthorised request</message>
+      |</errorResponse>
+    """.stripMargin
+ 
+   feature("Valid request is processed correctly") {
     scenario("Response status 200 when user submits correct request") {
       Given("the API is available")
       startApiSubscriptionFieldsService(apiSubscriptionKeyForXClientIdV1)

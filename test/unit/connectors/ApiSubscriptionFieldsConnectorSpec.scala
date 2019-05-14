@@ -29,7 +29,7 @@ import uk.gov.hmrc.customs.file.upload.services.FileUploadConfigService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpReads, NotFoundException}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.test.UnitSpec
-import util.CustomsDeclarationsExternalServicesConfig.ApiSubscriptionFieldsContext
+import util.CustomsFileUploadExternalServicesConfig.ApiSubscriptionFieldsContext
 import util.ExternalServicesConfig._
 import util.{ApiSubscriptionFieldsTestData, TestData}
 

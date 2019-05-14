@@ -61,12 +61,11 @@ object UploadedCallbackDecider{
   implicit val reads = Json.reads[UploadedCallbackDecider]
 }
 
-case class UploadedReadyCallbackBody(
-                              reference: FileReference,
-                              downloadUrl: URL,
-                              fileStatus: UploadedFileStatus = ReadyFileStatus,
-                              uploadDetails: UploadedDetails
-                            ) extends UploadedCallbackBody
+case class UploadedReadyCallbackBody(reference: FileReference,
+                                     downloadUrl: URL,
+                                     fileStatus: UploadedFileStatus = ReadyFileStatus,
+                                     uploadDetails: UploadedDetails)
+  extends UploadedCallbackBody
 
 object UploadedReadyCallbackBody {
   implicit val urlFormat = HttpUrlFormat
@@ -83,11 +82,10 @@ object UploadedReadyCallbackBody {
   }
 }
 
-case class UploadedFailedCallbackBody(
-                               reference: FileReference,
-                               fileStatus: UploadedFileStatus = FailedFileStatus,
-                               failureDetails: UploadedErrorDetails
-                             ) extends UploadedCallbackBody
+case class UploadedFailedCallbackBody(reference: FileReference,
+                                      fileStatus: UploadedFileStatus = FailedFileStatus,
+                                      failureDetails: UploadedErrorDetails)
+  extends UploadedCallbackBody
 
 object UploadedFailedCallbackBody {
   implicit val readsFailedCallback: Reads[UploadedFailedCallbackBody] = Json.reads[UploadedFailedCallbackBody]

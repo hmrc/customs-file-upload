@@ -5,6 +5,6 @@ POST        /upload                       @uk.gov.hmrc.customs.file.upload.contr
 
 GET         /admin/metrics                @com.kenshoo.play.metrics.MetricsController.metrics
 
-POST        /uploaded-file-upscan-notifications/clientSubscriptionId/:clientSubscriptionId     @uk.gov.hmrc.customs.file.upload.controllers.FileUploadUpscanNotificationController.post(clientSubscriptionId)
+POST        /uploaded-file-upscan-notifications/clientSubscriptionId/:clientSubscriptionId     @uk.gov.hmrc.customs.file.upload.controllers.UpscanNotificationController.post(clientSubscriptionId)
 
 POST        /file-transmission-notify/clientSubscriptionId/:clientSubscriptionId     @uk.gov.hmrc.customs.file.upload.controllers.FileTransmissionNotificationController.post(clientSubscriptionId)

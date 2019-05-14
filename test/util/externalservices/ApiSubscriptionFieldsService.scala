@@ -20,10 +20,10 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.test.Helpers.OK
 import uk.gov.hmrc.customs.file.upload.model.ApiSubscriptionKey
 import uk.gov.hmrc.customs.file.upload.connectors.ApiSubscriptionFieldsPath.url
-import util.{ApiSubscriptionFieldsTestData, CustomsDeclarationsExternalServicesConfig, WireMockRunner}
+import util.{ApiSubscriptionFieldsTestData, CustomsFileUploadExternalServicesConfig, WireMockRunner}
 
 trait ApiSubscriptionFieldsService extends WireMockRunner with ApiSubscriptionFieldsTestData {
-  private def apiSubsUrl(apiSubsKey: ApiSubscriptionKey) = url(CustomsDeclarationsExternalServicesConfig.ApiSubscriptionFieldsContext, apiSubsKey)
+  private def apiSubsUrl(apiSubsKey: ApiSubscriptionKey) = url(CustomsFileUploadExternalServicesConfig.ApiSubscriptionFieldsContext, apiSubsKey)
   private def urlMatchingRequestPath(apiSubs: ApiSubscriptionKey) = {
     urlEqualTo(apiSubsUrl(apiSubs))
   }

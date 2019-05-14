@@ -22,7 +22,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.{AnyContentAsXml, Result}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.customs.api.common.controllers.{ErrorResponse, ResponseContents}
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.FileUploadPayloadValidationAction
+import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.PayloadValidationAction
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.Csp
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 import scala.xml.SAXException
 
 
-class FileUploadPayloadValidationActionSpec extends UnitSpec with MockitoSugar {
+class PayloadValidationActionSpec extends UnitSpec with MockitoSugar {
 
   private implicit val forConversions: ConversationIdRequest[AnyContentAsXml] = TestConversationIdRequest
   private val saxException = new SAXException("Boom!")
@@ -46,7 +46,7 @@ class FileUploadPayloadValidationActionSpec extends UnitSpec with MockitoSugar {
   trait SetUp {
     val mockXmlValidationService: XmlValidationService = mock[XmlValidationService]
     val mockExportsLogger: FileUploadLogger = mock[FileUploadLogger]
-    val payloadValidationAction: FileUploadPayloadValidationAction = new FileUploadPayloadValidationAction(mockXmlValidationService, mockExportsLogger){}
+    val payloadValidationAction: PayloadValidationAction = new PayloadValidationAction(mockXmlValidationService, mockExportsLogger){}
   }
   "PayloadValidationAction" should {
     "return a ValidatedPayloadRequest when XML validation is OK" in new SetUp {

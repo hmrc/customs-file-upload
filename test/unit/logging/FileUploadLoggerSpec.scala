@@ -39,7 +39,7 @@ class FileUploadLoggerSpec extends UnitSpec with MockitoSugar {
       .toCspAuthorisedRequest(Csp(badgeIdentifier))
   }
 
-  "DeclarationsLogger" should {
+  "FileUploadLogger" should {
     "debug(s: => String)" in new SetUp {
       logger.debug("msg")
 

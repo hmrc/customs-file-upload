@@ -29,10 +29,15 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.customs.file.upload.services.{DateTimeService, UniqueIdsService}
 import util.TestData.stubUniqueIdsService
-import util.{CustomsDeclarationsExternalServicesConfig, ExternalServicesConfig}
+import util.{CustomsFileUploadExternalServicesConfig, ExternalServicesConfig}
 
-trait ComponentTestSpec extends FeatureSpec with GivenWhenThen with GuiceOneAppPerSuite
-  with BeforeAndAfterAll with BeforeAndAfterEach with Eventually with MockitoSugar {
+trait ComponentTestSpec extends FeatureSpec
+  with GivenWhenThen
+  with GuiceOneAppPerSuite
+  with BeforeAndAfterAll
+  with BeforeAndAfterEach
+  with Eventually
+  with MockitoSugar {
 
   private val mockDateTimeService =  mock[DateTimeService]
 
@@ -50,11 +55,11 @@ trait ComponentTestSpec extends FeatureSpec with GivenWhenThen with GuiceOneAppP
     "microservice.services.auth.port" -> ExternalServicesConfig.Port,
     "microservice.services.api-subscription-fields.host" -> ExternalServicesConfig.Host,
     "microservice.services.api-subscription-fields.port" -> ExternalServicesConfig.Port,
-    "microservice.services.api-subscription-fields.context" -> CustomsDeclarationsExternalServicesConfig.ApiSubscriptionFieldsContext,
-    "upscan-initiate.url" -> s"http://${ExternalServicesConfig.Host}:${ExternalServicesConfig.Port}${CustomsDeclarationsExternalServicesConfig.UpscanInitiateContext}",
+    "microservice.services.api-subscription-fields.context" -> CustomsFileUploadExternalServicesConfig.ApiSubscriptionFieldsContext,
+    "upscan-initiate.url" -> s"http://${ExternalServicesConfig.Host}:${ExternalServicesConfig.Port}${CustomsFileUploadExternalServicesConfig.UpscanInitiateContext}",
     "microservice.services.upscan-initiate.host" -> ExternalServicesConfig.Host,
     "microservice.services.upscan-initiate.port" -> ExternalServicesConfig.Port,
-    "microservice.services.upscan-initiate.context" -> CustomsDeclarationsExternalServicesConfig.UpscanInitiateContext,
+    "microservice.services.upscan-initiate.context" -> CustomsFileUploadExternalServicesConfig.UpscanInitiateContext,
     "microservice.services.upscan-initiate.bearer-token" -> ExternalServicesConfig.AuthToken,
     "auditing.enabled" -> false,
     "auditing.consumer.baseUri.host" -> ExternalServicesConfig.Host,
@@ -62,10 +67,10 @@ trait ComponentTestSpec extends FeatureSpec with GivenWhenThen with GuiceOneAppP
     "microservice.services.customs-notification.host" -> ExternalServicesConfig.Host,
     "microservice.services.customs-notification.port" -> ExternalServicesConfig.Port,
     "microservice.services.customs-notification.context" -> "/customs-notification/notify",
-    "microservice.services.customs-notification.bearer-token" -> CustomsDeclarationsExternalServicesConfig.CustomsNotificationAuthHeaderValue,
+    "microservice.services.customs-notification.bearer-token" -> CustomsFileUploadExternalServicesConfig.CustomsNotificationAuthHeaderValue,
     "microservice.services.file-transmission.host" -> ExternalServicesConfig.Host,
     "microservice.services.file-transmission.port" -> ExternalServicesConfig.Port,
-    "microservice.services.file-transmission.context" -> CustomsDeclarationsExternalServicesConfig.FileTransmissionContext
+    "microservice.services.file-transmission.context" -> CustomsFileUploadExternalServicesConfig.FileTransmissionContext
   )).build()
 
 }

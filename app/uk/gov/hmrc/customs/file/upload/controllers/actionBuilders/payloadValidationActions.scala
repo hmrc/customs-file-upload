@@ -33,9 +33,9 @@ import scala.util.control.NonFatal
 import scala.xml.{NodeSeq, SAXException}
 
 @Singleton
-class FileUploadPayloadValidationAction @Inject()(xmlValidationService: XmlValidationService,
-                                                  logger: FileUploadLogger)
-                                                 (implicit ec: ExecutionContext)
+class PayloadValidationAction @Inject()(xmlValidationService: XmlValidationService,
+                                        logger: FileUploadLogger)
+                                       (implicit ec: ExecutionContext)
   extends ActionRefiner[AuthorisedRequest, ValidatedPayloadRequest] {
 
   override def refine[A](ar: AuthorisedRequest[A]): Future[Either[Result, ValidatedPayloadRequest[A]]] = {
@@ -91,10 +91,10 @@ class FileUploadPayloadValidationAction @Inject()(xmlValidationService: XmlValid
   
 }
 
-class FileUploadPayloadValidationComposedAction @Inject()(val fileUploadPayloadValidationAction: FileUploadPayloadValidationAction,
-                                                          val logger: FileUploadLogger,
-                                                          val fileUploadConfigService: FileUploadConfigService)
-                                                         (implicit ec: ExecutionContext)
+class PayloadValidationComposedAction @Inject()(val payloadValidationAction: PayloadValidationAction,
+                                                val logger: FileUploadLogger,
+                                                val fileUploadConfigService: FileUploadConfigService)
+                                               (implicit ec: ExecutionContext)
   extends ActionRefiner[AuthorisedRequest, ValidatedFileUploadPayloadRequest] with HttpStatusCodeShortDescriptions {
 
   private val declarationIdLabel = "DeclarationID"
@@ -120,7 +120,7 @@ class FileUploadPayloadValidationComposedAction @Inject()(val fileUploadPayloadV
     implicit val implicitAr: AuthorisedRequest[A] = ar
     ar.authorisedAs match {
       case CspWithEori(_, _) | NonCsp(_) =>
-        fileUploadPayloadValidationAction.refine(ar).map {
+        payloadValidationAction.refine(ar).map {
           case Right(validatedFilePayloadRequest) =>
 
             implicit val implicitVpr: ValidatedPayloadRequest[A] = validatedFilePayloadRequest

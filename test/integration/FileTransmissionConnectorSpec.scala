@@ -32,10 +32,13 @@ import util.ExternalServicesConfig.{Host, Port}
 import util.FileTransmissionTestData._
 import util.VerifyLogging._
 import util.externalservices.FileTransmissionService
-import util.{CustomsDeclarationsExternalServicesConfig, TestData}
+import util.{CustomsFileUploadExternalServicesConfig, TestData}
 
-class FileTransmissionConnectorSpec extends IntegrationTestSpec with GuiceOneAppPerSuite with MockitoSugar
-  with BeforeAndAfterAll with FileTransmissionService {
+class FileTransmissionConnectorSpec extends IntegrationTestSpec
+  with GuiceOneAppPerSuite
+  with MockitoSugar
+  with BeforeAndAfterAll
+  with FileTransmissionService {
 
   private lazy val connector = app.injector.instanceOf[FileTransmissionConnector]
   private implicit val mockCdsLogger: CdsLogger = mock[CdsLogger]
@@ -67,7 +70,7 @@ class FileTransmissionConnectorSpec extends IntegrationTestSpec with GuiceOneApp
       "auditing.enabled" -> false,
       "microservice.services.file-transmission.host" -> Host,
       "microservice.services.file-transmission.port" -> Port,
-      "microservice.services.file-transmission.context" -> CustomsDeclarationsExternalServicesConfig.FileTransmissionContext
+      "microservice.services.file-transmission.context" -> CustomsFileUploadExternalServicesConfig.FileTransmissionContext
     )).build()
 
   "FileTransmissionConnector" should {
@@ -86,7 +89,7 @@ class FileTransmissionConnectorSpec extends IntegrationTestSpec with GuiceOneApp
 
       intercept[RuntimeException](await(sendValidRequest)).getCause.getClass shouldBe classOf[NotFoundException]
 
-      verifyDeclarationsLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission, HttpStatus=404, Error=POST of 'http://localhost:11111/file/transmission' returned 404 (Not Found). Response body: ''")
+      verifyFileUploadLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission, HttpStatus=404, Error=POST of 'http://localhost:11111/file/transmission' returned 404 (Not Found). Response body: ''")
     }
 
     "return a failed future when external service returns 400" in {
@@ -94,7 +97,7 @@ class FileTransmissionConnectorSpec extends IntegrationTestSpec with GuiceOneApp
 
       intercept[RuntimeException](await(sendValidRequest)).getCause.getClass shouldBe classOf[BadRequestException]
 
-      verifyDeclarationsLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission, HttpStatus=400, Error=POST of 'http://localhost:11111/file/transmission' returned 400 (Bad Request). Response body ''")
+      verifyFileUploadLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission, HttpStatus=400, Error=POST of 'http://localhost:11111/file/transmission' returned 400 (Bad Request). Response body ''")
     }
 
     "return a failed future when external service returns 500" in {
@@ -102,7 +105,7 @@ class FileTransmissionConnectorSpec extends IntegrationTestSpec with GuiceOneApp
 
       intercept[Upstream5xxResponse](await(sendValidRequest))
 
-      verifyDeclarationsLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission")
+      verifyFileUploadLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission")
     }
 
     "return a failed future when fail to connect the external service" in {
@@ -110,7 +113,7 @@ class FileTransmissionConnectorSpec extends IntegrationTestSpec with GuiceOneApp
 
       intercept[RuntimeException](await(sendValidRequest)).getCause.getClass shouldBe classOf[BadGatewayException]
 
-      verifyDeclarationsLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission, HttpStatus=502, Error=POST of 'http://localhost:11111/file/transmission' failed. Caused by: 'Connection refused: localhost/127.0.0.1:11111'")
+      verifyFileUploadLoggerError("Call to file transmission failed. url=http://localhost:11111/file/transmission, HttpStatus=502, Error=POST of 'http://localhost:11111/file/transmission' failed. Caused by: 'Connection refused: localhost/127.0.0.1:11111'")
 
       startMockServer()
     }

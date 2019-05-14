@@ -58,10 +58,10 @@ class AuthActionSpec extends UnitSpec with MockitoSugar {
 
   trait SetUp extends AuthConnectorStubbing {
     val mockLogger: FileUploadLogger = mock[FileUploadLogger]
-    val mockDeclarationConfigService: FileUploadConfigService = mock[FileUploadConfigService]
+    val mockFileUploadConfigService: FileUploadConfigService = mock[FileUploadConfigService]
     protected val customsAuthService = new CustomsAuthService(mockAuthConnector, mockLogger)
     protected val headerValidator = new HeaderValidator(mockLogger)
-    val fileUploadAuthAction = new AuthAction(customsAuthService, headerValidator, mockLogger, mockDeclarationConfigService)
+    val fileUploadAuthAction = new AuthAction(customsAuthService, headerValidator, mockLogger, mockFileUploadConfigService)
   }
 
   "AuthAction Builder " can {

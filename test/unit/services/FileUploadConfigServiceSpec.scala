@@ -35,9 +35,6 @@ class FileUploadConfigServiceSpec extends UnitSpec with MockitoSugar {
       |microservice.services.customs-notification.port=1112
       |microservice.services.customs-notification.bearer-token=some-token
       |microservice.services.customs-notification.context=/some-context2
-      |microservice.services.customs-declarations-metrics.host=some-host3
-      |microservice.services.customs-declarations-metrics.port=1113
-      |microservice.services.customs-declarations-metrics.context=/some-context3
       |upscan-callback.url="http://upscan-callback.url"
       |file-upload-upscan-callback.url="http://file-upload-upscan-callback.url"
       |file-transmission-callback.url="http://some-host3:1113/file-transmission"

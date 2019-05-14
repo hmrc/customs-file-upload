@@ -28,7 +28,7 @@ import play.api.test._
 import uk.gov.hmrc.customs.file.upload.controllers.FileUploadDocumentationController
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 
-class DeclarationsDocumentationControllerSpec extends PlaySpec with MockitoSugar with Results with BeforeAndAfterEach {
+class FileUploadDocumentationControllerSpec extends PlaySpec with MockitoSugar with Results with BeforeAndAfterEach {
 
   private val mockService = mock[HttpErrorHandler]
 
