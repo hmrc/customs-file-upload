@@ -41,29 +41,29 @@ class FileTransmissionNotificationController @Inject()(callbackToXmlNotification
 
     Try(UUID.fromString(clientSubscriptionIdString)) match {
       case Success(csid) =>
-      val clientSubscriptionId = SubscriptionFieldsId(csid)
-      request.body.asJson.fold(
-        {
-          cdsLogger.error(s"Malformed JSON received. Body: ${request.body.asText} headers: ${request.headers}")
-          Future.successful(errorBadRequest(errorMessage = "Invalid JSON payload").JsonResult)
-        }
-      ) { js =>
-        FileTransmissionCallbackDecider.parse(js) match {
-          case JsSuccess(callbackBody, _) => callbackBody match {
-            case notification: FileTransmissionNotification =>
-              cdsLogger.debug(s"Valid JSON success request received. Body=$js headers=${request.headers}")
-              notificationService.sendMessage[FileTransmissionNotification](notification, notification.fileReference, clientSubscriptionId)(callbackToXmlNotification).map { _ =>
-                NoContent
-              }.recover {
-                case e: Throwable =>
-                  handleException(e, notification, clientSubscriptionId)
-              }
+        val clientSubscriptionId = SubscriptionFieldsId(csid)
+        request.body.asJson.fold(
+          {
+            cdsLogger.error(s"Malformed JSON received. Body: ${request.body.asText} headers: ${request.headers}")
+            Future.successful(errorBadRequest(errorMessage = "Invalid JSON payload").JsonResult)
           }
-          case _: JsError =>
-            cdsLogger.error(s"Invalid JSON received. Body: ${request.body.asText} headers: ${request.headers}")
-            Future.successful(errorBadRequest(errorMessage = "Invalid file upload outcome").JsonResult)
+        ) { js =>
+          FileTransmissionCallbackDecider.parse(js) match {
+            case JsSuccess(callbackBody, _) => callbackBody match {
+              case notification: FileTransmissionNotification =>
+                cdsLogger.debug(s"Valid JSON success request received. Body=$js headers=${request.headers}")
+                notificationService.sendMessage[FileTransmissionNotification](notification, notification.fileReference, clientSubscriptionId)(callbackToXmlNotification).map { _ =>
+                  NoContent
+                }.recover {
+                  case e: Throwable =>
+                    handleException(e, notification, clientSubscriptionId)
+                }
+            }
+            case _: JsError =>
+              cdsLogger.error(s"Invalid JSON received. Body: ${request.body.asText} headers: ${request.headers}")
+              Future.successful(errorBadRequest(errorMessage = "Invalid file upload outcome").JsonResult)
+          }
         }
-      }
       case Failure(e) =>
         cdsLogger.error("Invalid clientSubscriptionId", e)
         Future.successful(errorBadRequest(errorMessage = "Invalid clientSubscriptionId").JsonResult)

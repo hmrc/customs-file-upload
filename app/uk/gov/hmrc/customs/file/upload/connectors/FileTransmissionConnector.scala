@@ -50,7 +50,9 @@ class FileTransmissionConnector @Inject()(http: HttpClient,
       ()
     }.recoverWith {
         case httpError: HttpException =>
-          logger.error(s"Call to file transmission failed. url=$url, HttpStatus=${httpError.responseCode}, Error=${httpError.message}")
+          val msg = s"Call to file transmission failed. url=$url, HttpStatus=${httpError.responseCode}, Error=${httpError.message}"
+          logger.debug(msg, httpError)
+          logger.error(msg)
           Future.failed(new RuntimeException(httpError))
         case e: Throwable =>
           logger.error(s"Call to file transmission failed. url=$url")

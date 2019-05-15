@@ -49,9 +49,16 @@ class ApiSubscriptionFieldsConnector @Inject()(http: HttpClient,
       }
       .recoverWith {
         case e: Throwable =>
-          logger.error(s"Call to subscription information service failed. url=$url")
+          val msg = s"Call to subscription information service failed. url=$url"
+          logger.debug(msg, e)
+          logger.error(msg)
           Future.failed(e)
       }
   }
 
+}
+
+object ApiSubscriptionFieldsPath {
+  def url(baseUrlAndContext: String, apiSubscriptionKey: ApiSubscriptionKey): String =
+    s"$baseUrlAndContext/application/${apiSubscriptionKey.clientId}/context/${apiSubscriptionKey.context}/version/${apiSubscriptionKey.version}"
 }

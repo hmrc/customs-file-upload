@@ -20,6 +20,7 @@ import com.google.inject.{Inject, Singleton}
 import play.mvc.Http.HeaderNames._
 import play.mvc.Http.MimeTypes
 import uk.gov.hmrc.customs.api.common.logging.CdsLogger
+import uk.gov.hmrc.customs.file.upload.controllers.CustomHeaderNames._
 import uk.gov.hmrc.customs.file.upload.services.{FileUploadConfigService, FileUploadCustomsNotification}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse}
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
@@ -38,12 +39,11 @@ class CustomsNotificationConnector @Inject()(http: HttpClient,
   def send(notification: FileUploadCustomsNotification): Future[Unit] = {
 
     val headers: Map[String, String] = Map(
-      "X-CDS-Client-ID" -> notification.clientSubscriptionId.toString,
-      "X-Conversation-ID" -> notification.conversationId.toString,
+      XCdsClientIdHeaderName -> notification.clientSubscriptionId.toString,
+      XConversationIdHeaderName -> notification.conversationId.toString,
       CONTENT_TYPE -> s"${MimeTypes.XML}; charset=UTF-8",
       ACCEPT -> MimeTypes.XML,
       AUTHORIZATION -> s"Basic ${config.fileUploadConfig.customsNotificationBearerToken}")
-
 
     (http.POSTString[HttpResponse](
       config.fileUploadConfig.customsNotificationBaseUrl,
@@ -58,8 +58,6 @@ class CustomsNotificationConnector @Inject()(http: HttpClient,
         logger.error(s"[conversationId=${notification.conversationId}][clientSubscriptionId=${notification.clientSubscriptionId}]: Call to customs notification failed. url=${config.fileUploadConfig.customsNotificationBaseUrl}")
         Future.failed(e)
     }
-
-
   }
+  
 }
-

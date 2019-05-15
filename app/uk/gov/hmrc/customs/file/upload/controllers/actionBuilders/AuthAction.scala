@@ -79,7 +79,7 @@ class AuthAction @Inject()(customsAuthService: CustomsAuthService,
     val eventualAuthWithBadgeId: Future[Either[ErrorResponse, Option[AuthorisedAsCsp]]] = customsAuthService.authAsCsp().map{
       case Right(isCsp) =>
         if (isCsp) {
-          eitherCspAuthData().right.map(authAsCsp => Some(authAsCsp))
+          eitherAuthorisedAsCsp().right.map(authAsCsp => Some(authAsCsp))
         } else {
           Right(None)
         }
@@ -90,7 +90,7 @@ class AuthAction @Inject()(customsAuthService: CustomsAuthService,
     eventualAuthWithBadgeId
   }
 
-  protected def eitherCspAuthData[A]()(implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, AuthorisedAsCsp] = {
+  protected def eitherAuthorisedAsCsp[A]()(implicit vhr: HasRequest[A] with HasConversationId): Either[ErrorResponse, AuthorisedAsCsp] = {
 
     for {
       badgeId <- eitherBadgeIdentifier.right

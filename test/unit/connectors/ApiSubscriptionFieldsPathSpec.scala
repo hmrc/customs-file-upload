@@ -24,7 +24,8 @@ class ApiSubscriptionFieldsPathSpec extends UnitSpec with ApiSubscriptionFieldsT
 
   "ApiSubscriptionFieldsPath" should {
     "construct path" in {
-      ApiSubscriptionFieldsPath.url("/some-context", apiSubscriptionKey) shouldBe "/some-context/application/SOME_X_CLIENT_ID/context/some/api/context/version/1.0"
+      ApiSubscriptionFieldsPath.url("/some-context", apiSubscriptionKey) shouldBe
+        "/some-context/application/SOME_X_CLIENT_ID/context/some/api/context/version/1.0"
     }
   }
 }
