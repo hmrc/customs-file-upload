@@ -23,7 +23,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.AnyContentAsXml
 import play.api.test.FakeRequest
 import uk.gov.hmrc.customs.api.common.controllers.{ErrorResponse, ResponseContents}
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{PayloadValidationAction, PayloadValidationComposedAction}
+import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{PayloadValidationAction, PayloadContentValidationAction}
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.{AuthorisedRequest, ValidatedPayloadRequest, _}
@@ -38,14 +38,14 @@ import scala.concurrent.Future
 import scala.xml.Elem
 
 
-class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
+class PayloadContentValidationActionSpec extends UnitSpec with MockitoSugar {
 
   trait SetUp {
     val mockLogger: FileUploadLogger = mock[FileUploadLogger]
-    val mockFileUploadPayloadValidationAction: PayloadValidationAction = mock[PayloadValidationAction]
+    val mockPayloadValidationAction: PayloadValidationAction = mock[PayloadValidationAction]
     val mockFileUploadConfigService: FileUploadConfigService = mock[FileUploadConfigService]
     when(mockFileUploadConfigService.fileUploadConfig).thenReturn(fileUploadConfig)
-    val action: PayloadValidationComposedAction = new PayloadValidationComposedAction(mockFileUploadPayloadValidationAction, mockLogger, mockFileUploadConfigService)
+    val action: PayloadContentValidationAction = new PayloadContentValidationAction(mockPayloadValidationAction, mockLogger, mockFileUploadConfigService)
   }
 
   "FileUploadPayloadValidationComposedAction" should {
@@ -57,9 +57,9 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
         clientId, NonCsp(Eori("EORI123")), FakeRequest("GET", "/").withXmlBody(payload))
       val testVpr: ValidatedPayloadRequest[AnyContentAsXml] = testAr.toValidatedPayloadRequest(payload)
       when(mockFileUploadConfigService.fileUploadConfig).thenReturn(fileUploadConfig.copy(fileGroupSizeMaximum = 1))
-      when(mockFileUploadPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
+      when(mockPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
 
-      val result = await(action.refine(testAr))
+      val result = await(action.refine(testVpr))
 
       val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "FileGroupSize exceeds 3 limit")).XmlResult)
       result shouldBe expected
@@ -71,9 +71,9 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
       val testAr: AuthorisedRequest[AnyContentAsXml] = AuthorisedRequest(conversationId, VersionOne,
         clientId, NonCsp(Eori("EORI123")), FakeRequest("GET", "/").withXmlBody(payload))
       val testVpr: ValidatedPayloadRequest[AnyContentAsXml] = testAr.toValidatedPayloadRequest(payload)
-      when(mockFileUploadPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
+      when(mockPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
 
-      val result = await(action.refine(testAr))
+      val result = await(action.refine(testVpr))
 
       val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "FileSequenceNo must not be greater than FileGroupSize")).XmlResult)
       result shouldBe expected
@@ -85,9 +85,9 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
       val testAr: AuthorisedRequest[AnyContentAsXml] = AuthorisedRequest(conversationId, VersionOne,
         clientId, NonCsp(Eori("EORI123")), FakeRequest("GET", "/").withXmlBody(payload))
       val testVpr: ValidatedPayloadRequest[AnyContentAsXml] = testAr.toValidatedPayloadRequest(payload)
-      when(mockFileUploadPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
+      when(mockPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
 
-      val result = await(action.refine(testAr))
+      val result = await(action.refine(testVpr))
 
       val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "FileGroupSize does not match number of File elements"), ResponseContents("BAD_REQUEST", "FileSequenceNo contains duplicates")).XmlResult)
       result shouldBe expected
@@ -99,9 +99,9 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
       val testAr: AuthorisedRequest[AnyContentAsXml] = AuthorisedRequest(conversationId, VersionOne,
         clientId, NonCsp(Eori("EORI123")), FakeRequest("GET", "/").withXmlBody(payload))
       val testVpr: ValidatedPayloadRequest[AnyContentAsXml] = testAr.toValidatedPayloadRequest(payload)
-      when(mockFileUploadPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
+      when(mockPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
 
-      val result = await(action.refine(testAr))
+      val result = await(action.refine(testVpr))
 
       val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "FileSequenceNo contains duplicates")).XmlResult)
       result shouldBe expected
@@ -113,9 +113,9 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
       val testAr: AuthorisedRequest[AnyContentAsXml] = AuthorisedRequest(conversationId, VersionOne,
         clientId, NonCsp(Eori("EORI123")), FakeRequest("GET", "/").withXmlBody(payload))
       val testVpr: ValidatedPayloadRequest[AnyContentAsXml] = testAr.toValidatedPayloadRequest(payload)
-      when(mockFileUploadPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
+      when(mockPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
 
-      val result = await(action.refine(testAr))
+      val result = await(action.refine(testVpr))
 
       val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "FileSequenceNo must start from 1")).XmlResult)
       result shouldBe expected
@@ -127,7 +127,7 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
       val testAr: AuthorisedRequest[AnyContentAsXml] = AuthorisedRequest(conversationId, VersionOne,
         clientId, NonCsp(Eori("EORI123")), FakeRequest("GET", "/").withXmlBody(payload))
       val testVpr: ValidatedPayloadRequest[AnyContentAsXml] = testAr.toValidatedPayloadRequest(payload)
-      when(mockFileUploadPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
+      when(mockPayloadValidationAction.refine(testAr)).thenReturn(Future.successful(Right(testVpr)))
       val expected = Right(testVpr.toValidatedFileUploadPayloadRequest(
         FileUploadRequest(DeclarationId("declarationId"),
           FileGroupSize(2),
@@ -138,7 +138,7 @@ class PayloadValidationComposedActionSpec extends UnitSpec with MockitoSugar {
         )
       ))
 
-      val result = await(action.refine(testAr))
+      val result = await(action.refine(testVpr))
 
       result shouldBe expected
     }

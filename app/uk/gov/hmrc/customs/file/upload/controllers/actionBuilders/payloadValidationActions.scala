@@ -92,11 +92,11 @@ class PayloadValidationAction @Inject()(xmlValidationService: XmlValidationServi
 }
 
 @Singleton
-class PayloadValidationComposedAction @Inject()(val payloadValidationAction: PayloadValidationAction,
-                                                val logger: FileUploadLogger,
-                                                val fileUploadConfigService: FileUploadConfigService)
-                                               (implicit ec: ExecutionContext)
-  extends ActionRefiner[AuthorisedRequest, ValidatedFileUploadPayloadRequest] with HttpStatusCodeShortDescriptions {
+class PayloadContentValidationAction @Inject()(val payloadValidationAction: PayloadValidationAction,
+                                               val logger: FileUploadLogger,
+                                               val fileUploadConfigService: FileUploadConfigService)
+                                              (implicit ec: ExecutionContext)
+  extends ActionRefiner[ValidatedPayloadRequest, ValidatedFileUploadPayloadRequest] with HttpStatusCodeShortDescriptions {
 
   private val declarationIdLabel = "DeclarationID"
   private val documentTypeLabel = "DocumentType"
@@ -117,36 +117,30 @@ class PayloadValidationComposedAction @Inject()(val payloadValidationAction: Pay
   private val errorDuplicateFileSequenceNo = ResponseContents(BadRequestCode, errorDuplicateFileSequenceNoMsg)
   private val errorFileSequenceNoLessThanOne = ResponseContents(BadRequestCode, errorFileSequenceNoLessThanOneMsg)
 
-  override def refine[A](ar: AuthorisedRequest[A]): Future[Either[Result, ValidatedFileUploadPayloadRequest[A]]] = {
-    implicit val implicitAr: AuthorisedRequest[A] = ar
-    ar.authorisedAs match {
+  override def refine[A](vpr: ValidatedPayloadRequest[A]): Future[Either[Result, ValidatedFileUploadPayloadRequest[A]]] = {
+    implicit val validatedFilePayloadRequest: ValidatedPayloadRequest[A] = vpr
+    vpr.authorisedAs match {
       case CspWithEori(_, _) | NonCsp(_) =>
-        payloadValidationAction.refine(ar).map {
-          case Right(validatedFilePayloadRequest) =>
+        val xml = validatedFilePayloadRequest.xmlBody
 
-            implicit val implicitVpr: ValidatedPayloadRequest[A] = validatedFilePayloadRequest
-            val xml = validatedFilePayloadRequest.xmlBody
+        val declarationId = DeclarationId((xml \ declarationIdLabel).text)
+        val fileGroupSize = FileGroupSize((xml \ fileGroupSizeLabel).text.trim.toInt)
 
-            val declarationId = DeclarationId((xml \ declarationIdLabel).text)
-            val fileGroupSize = FileGroupSize((xml \ fileGroupSizeLabel).text.trim.toInt)
+        val files: Seq[FileUploadFile] = (xml \ filesLabel \ "_").theSeq.collect {
+          case file =>
+            val fileSequenceNumber = FileSequenceNo((file \ fileSequenceNoLabel).text.trim.toInt)
+            val maybeDocumentTypeText = (file \ documentTypeLabel).text
+            val documentType = if (maybeDocumentTypeText.isEmpty) None else Some(DocumentType(maybeDocumentTypeText))
+            FileUploadFile(fileSequenceNumber, documentType)
+          }
 
-            val files: Seq[FileUploadFile] = (xml \ filesLabel \ "_").theSeq.collect {
-              case file =>
-                val fileSequenceNumber = FileSequenceNo((file \ fileSequenceNoLabel).text.trim.toInt)
-                val maybeDocumentTypeText = (file \ documentTypeLabel).text
-                val documentType = if (maybeDocumentTypeText.isEmpty) None else Some(DocumentType(maybeDocumentTypeText))
-                FileUploadFile(fileSequenceNumber, documentType)
-              }
+        val fileUpload = FileUploadRequest(declarationId, fileGroupSize, files.sortWith(_.fileSequenceNo.value < _.fileSequenceNo.value))
 
-            val fileUpload = FileUploadRequest(declarationId, fileGroupSize, files.sortWith(_.fileSequenceNo.value < _.fileSequenceNo.value))
-
-            additionalValidation(fileUpload) match {
-              case Right(_) =>
-                Right(validatedFilePayloadRequest.toValidatedFileUploadPayloadRequest(fileUpload))
-              case Left(errorResponse) =>
-                Left(errorResponse.XmlResult)
-            }
-          case Left(result) => Left(result)
+        additionalValidation(fileUpload) match {
+          case Right(_) =>
+            Future.successful(Right(validatedFilePayloadRequest.toValidatedFileUploadPayloadRequest(fileUpload)))
+          case Left(errorResponse) =>
+            Future.successful(Left(errorResponse.XmlResult))
         }
       case _ => Future.successful(Left(ErrorResponse(FORBIDDEN, ForbiddenCode, "Not an authorized service").XmlResult.withConversationId))
     }

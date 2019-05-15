@@ -19,7 +19,7 @@ package uk.gov.hmrc.customs.file.upload.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.http.ContentTypes
 import play.api.mvc._
-import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthAction, ConversationIdAction, PayloadValidationComposedAction, ValidateAndExtractHeadersAction}
+import uk.gov.hmrc.customs.file.upload.controllers.actionBuilders.{AuthAction, ConversationIdAction, PayloadContentValidationAction, PayloadValidationAction, ValidateAndExtractHeadersAction}
 import uk.gov.hmrc.customs.file.upload.logging.FileUploadLogger
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ActionBuilderModelHelper._
 import uk.gov.hmrc.customs.file.upload.model.actionbuilders.ValidatedFileUploadPayloadRequest
@@ -32,7 +32,8 @@ import scala.concurrent.ExecutionContext
 class FileUploadController @Inject()(val conversationIdAction: ConversationIdAction,
                                      val validateAndExtractHeadersAction: ValidateAndExtractHeadersAction,
                                      val authAction: AuthAction,
-                                     val fileUploadPayloadValidationComposedAction: PayloadValidationComposedAction,
+                                     val payloadValidationAction: PayloadValidationAction,
+                                     val payloadContentValidationAction: PayloadContentValidationAction,
                                      val fileUploadBusinessService: FileUploadBusinessService,
                                      val logger: FileUploadLogger)
                                     (implicit ec: ExecutionContext)
@@ -50,7 +51,8 @@ class FileUploadController @Inject()(val conversationIdAction: ConversationIdAct
       conversationIdAction andThen
       validateAndExtractHeadersAction andThen
       authAction andThen
-      fileUploadPayloadValidationComposedAction
+      payloadValidationAction andThen
+      payloadContentValidationAction
     ).async(bodyParser = xmlOrEmptyBody) {
 
     implicit validatedRequest: ValidatedFileUploadPayloadRequest[AnyContent] =>
