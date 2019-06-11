@@ -86,7 +86,7 @@ class FileUploadBusinessService @Inject()(upscanInitiateConnector: UpscanInitiat
                             (implicit validatedRequest: ValidatedFileUploadPayloadRequest[A],
                              hc: HeaderCarrier): Future[Seq[UpscanInitiateResponsePayload]] = {
 
-    val upscanInitiateRequests = validatedRequest.fileUploadRequest.files.map { f => f }
+    val upscanInitiateRequests = validatedRequest.fileUploadRequest.files
 
     failFastSequence(upscanInitiateRequests)(f => backendCall(subscriptionFieldsId, f))
   }

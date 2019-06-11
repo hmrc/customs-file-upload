@@ -25,7 +25,6 @@
             <xs:element type="xs:string" name="DocumentType" minOccurs="0"/>
             <xs:element type="xs:string" name="SuccessRedirect" />
             <xs:element type="xs:string" name="ErrorRedirect" />
-
         </xs:sequence>
     </xs:complexType>
 

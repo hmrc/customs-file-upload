@@ -80,6 +80,8 @@ object TestXMLData {
       <File>
         <FileSequenceNo>111111111111111111111111111111111111111</FileSequenceNo>
         <DocumentType>document type 1</DocumentType>
+        <SuccessRedirect>https://success-redirect.com</SuccessRedirect>
+        <ErrorRedirect>https://error-redirect.com</ErrorRedirect>
       </File>
     </Files>
   </FileUploadRequest>
