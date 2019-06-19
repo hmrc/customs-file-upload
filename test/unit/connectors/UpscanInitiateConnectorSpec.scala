@@ -58,12 +58,12 @@ class UpscanInitiateConnectorSpec extends UnitSpec with MockitoSugar with Before
 
     "when making a successful request" should {
 
-      "pass URL from config" in {
+      "pass V2 URL from config" in {
         returnResponseForRequest(Future.successful(mock[UpscanInitiateResponsePayload]))
 
         awaitRequest
 
-        verify(mockWsPost).POST(ameq("UPSCAN_INITIATE_URL"), any[UpscanInitiatePayload], any[SeqOfHeader])(
+        verify(mockWsPost).POST(ameq("UPSCAN_INITIATE_V2_URL"), any[UpscanInitiatePayload], any[SeqOfHeader])(
           any[Writes[UpscanInitiatePayload]], any[HttpReads[HttpResponse]](), any[HeaderCarrier](), any[ExecutionContext])
       }
 
