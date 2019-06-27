@@ -112,7 +112,7 @@ class PayloadContentValidationAction @Inject()(val payloadValidationAction: Payl
   private val errorMaxFileSequenceNoMsg = s"$fileSequenceNoLabel must not be greater than $fileGroupSizeLabel"
   private val errorDuplicateFileSequenceNoMsg = s"$fileSequenceNoLabel contains duplicates"
   private val errorFileSequenceNoLessThanOneMsg = s"$fileSequenceNoLabel must start from 1"
-  private val errorErrorRedirectWithoutSuccessRedirectMsg = s"if $errorRedirectLabel present then $successRedirectLabel must be too"
+  private val errorErrorRedirectWithoutSuccessRedirectMsg = s"If $errorRedirectLabel is present then $successRedirectLabel must be too"
 
   private val errorMaxFileGroupSize = ResponseContents(BadRequestCode, errorMaxFileGroupSizeMsg)
   private val errorFileGroupSize = ResponseContents(BadRequestCode, errorFileGroupSizeMsg)
@@ -160,7 +160,7 @@ class PayloadContentValidationAction @Inject()(val payloadValidationAction: Payl
     def errorRedirectOnly = validate(
       fileUpload,
       { b: FileUploadRequest =>
-        !b.files.exists(file =>file.errorRedirect.isDefined && file.successRedirect.isEmpty)
+        !b.files.exists(file => file.errorRedirect.isDefined && file.successRedirect.isEmpty)
       },
       errorErrorRedirectWithoutSuccessRedirect)
 

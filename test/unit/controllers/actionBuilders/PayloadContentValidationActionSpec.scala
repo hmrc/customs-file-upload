@@ -61,7 +61,7 @@ class PayloadContentValidationActionSpec extends UnitSpec with MockitoSugar {
 
       val result = await(action.refine(testVpr))
 
-      val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "if ErrorRedirect present then SuccessRedirect must be too")).XmlResult)
+      val expected = Left(new ErrorResponse(Status.BAD_REQUEST, "BAD_REQUEST", "Payload did not pass validation", ResponseContents("BAD_REQUEST", "If ErrorRedirect is present then SuccessRedirect must be too")).XmlResult)
       result shouldBe expected
     }
 
