@@ -29,7 +29,7 @@ import util.XmlOps.stringToXml
 import util.externalservices.{ApiSubscriptionFieldsService, AuthService, UpscanInitiateService}
 import util.{AuditService, TestData}
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
 
 class FileUploadSpec extends ComponentTestSpec
   with Matchers
@@ -81,12 +81,13 @@ class FileUploadSpec extends ComponentTestSpec
       setupExternalServiceExpectations()
 
       When("a POST request with data is sent to the API")
-      val result: Future[Result] = route(app = app, request).value
+      val result: Option[Future[Result]] = route(app = app, request)
+      val resultFuture = result.value
 
       Then("a response with a 200 (OK) status is received")
-      status(result) shouldBe OK
+      status(resultFuture) shouldBe OK
 
-      headers(result).get(X_CONVERSATION_ID_NAME) shouldBe 'defined
+      headers(resultFuture).get(X_CONVERSATION_ID_NAME) shouldBe 'defined
     }
   }
 
@@ -101,13 +102,14 @@ class FileUploadSpec extends ComponentTestSpec
       authServiceUnauthorisesCustomsEnrolmentForNonCSP(cspBearerToken)
 
       When("a POST request with data is sent to the API")
-      val result: Future[Result] = route(app = app, request).value
+      val result: Option[Future[Result]] = route(app = app, request)
+      val resultFuture = result.value
 
       Then("a response with a 401 (UNAUTHORIZED) status is received")
-      status(result) shouldBe UNAUTHORIZED
+      status(resultFuture) shouldBe UNAUTHORIZED
 
       And("the response body is empty")
-      stringToXml(contentAsString(result)) shouldBe stringToXml(UnauthorisedRequestError)
+      stringToXml(contentAsString(resultFuture)) shouldBe stringToXml(UnauthorisedRequestError)
 
       And("the request was authorised with AuthService")
       eventually(verifyAuthServiceCalledForCsp())

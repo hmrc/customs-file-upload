@@ -27,13 +27,13 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, AnyContent}
-import play.api.test.FakeRequest
+import play.api.test.{FakeRequest, Helpers}
 import play.api.test.Helpers.{contentAsString, _}
-import uk.gov.hmrc.customs.api.common.config.ServicesConfig
 import uk.gov.hmrc.customs.file.upload.controllers.UpscanNotificationController
-import uk.gov.hmrc.customs.file.upload.model.actionbuilders.HasConversationId
 import uk.gov.hmrc.customs.file.upload.model._
+import uk.gov.hmrc.customs.file.upload.model.actionbuilders.HasConversationId
 import uk.gov.hmrc.customs.file.upload.services.{FileUploadNotificationService, FileUploadUpscanNotificationBusinessService, InternalErrorXmlNotification, UpscanNotificationCallbackToXmlNotification}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import unit.logging.StubCdsLogger
 import util.ApiSubscriptionFieldsTestData.subscriptionFieldsId
 import util.TestData._
@@ -44,11 +44,13 @@ import scala.concurrent.Future
 class UpscanNotificationControllerSpec extends PlaySpec with MockitoSugar with Eventually {
 
   trait SetUp {
+    private val cc = Helpers.stubControllerComponents()
     val mockNotificationService: FileUploadNotificationService = mock[FileUploadNotificationService]
     val mockToXmlNotification: UpscanNotificationCallbackToXmlNotification = mock[UpscanNotificationCallbackToXmlNotification]
     val mockErrorToXmlNotification: InternalErrorXmlNotification = mock[InternalErrorXmlNotification]
     val mockBusinessService: FileUploadUpscanNotificationBusinessService = mock[FileUploadUpscanNotificationBusinessService]
     val controller = new UpscanNotificationController(
+      cc,
       mockNotificationService,
       mockToXmlNotification,
       mockErrorToXmlNotification,
