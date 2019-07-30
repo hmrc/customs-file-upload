@@ -19,7 +19,6 @@ package unit.controllers
 import org.mockito.Mockito._
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 import play.api.test.Helpers._
@@ -40,6 +39,7 @@ class FileTransmissionNotificationControllerSpec extends PlaySpec
 
   trait SetUp {
     val cc = Helpers.stubControllerComponents()
+    private implicit val ec = cc.executionContext
     val mockCdsLogger = mock[CdsLogger]
     val mockService = mock[FileUploadNotificationService]
     implicit val callbackToXmlNotification = mock[FileTransmissionCallbackToXmlNotification]
