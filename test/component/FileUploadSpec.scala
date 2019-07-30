@@ -19,6 +19,7 @@ package component
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Matchers, OptionValues}
 import play.api.libs.json.{JsObject, JsString}
 import play.api.mvc._
+import play.api.mvc.request.RequestTarget
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import uk.gov.hmrc.customs.file.upload.model.{ApiSubscriptionKey, VersionOne}
@@ -122,7 +123,8 @@ class FileUploadSpec extends ComponentTestSpec
       Given("the API is available")
       val request = InvalidFileUploadRequest.fromNonCsp
         .withJsonBody(JsObject(Seq("something" -> JsString("I am a json"))))
-        .copyFakeRequest(method = POST, uri = endpoint)
+        .withMethod("POST")
+        .withTarget(RequestTarget(path = endpoint, uriString = InvalidFileUploadRequest.uri, queryString = InvalidFileUploadRequest.queryString))
       setupExternalServiceExpectations()
 
       When("a POST request with data is sent to the API")
@@ -141,7 +143,8 @@ class FileUploadSpec extends ComponentTestSpec
 
     scenario("Response status 400 when user submits a malformed xml payload") {
       Given("the API is available")
-      val request = MalformedXmlRequest.fromNonCsp.copyFakeRequest(method = POST, uri = endpoint)
+      val request = MalformedXmlRequest.fromNonCsp.withMethod("POST")
+        .withTarget(RequestTarget(path = endpoint, uriString = MalformedXmlRequest.uri, queryString = MalformedXmlRequest.queryString))
       setupExternalServiceExpectations()
 
       When("a POST request with data is sent to the API")
