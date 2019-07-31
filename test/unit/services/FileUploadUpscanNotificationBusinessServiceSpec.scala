@@ -91,7 +91,7 @@ class FileUploadUpscanNotificationBusinessServiceSpec extends UnitSpec with Mock
       when(mockConnector.send(any[FileTransmission])(any[HasConversationId])).thenReturn(Future.successful(()))
 
       val actual: Unit = await(service.persistAndCallFileTransmission(subscriptionFieldsId, readyCallbackBody))
-      print(actual)
+
       actual shouldBe (())
       verify(mockRepo).update(
         ameq[UUID](subscriptionFieldsId.value).asInstanceOf[SubscriptionFieldsId],
