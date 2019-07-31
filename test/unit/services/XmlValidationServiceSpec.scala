@@ -51,7 +51,6 @@ class XmlValidationServiceSpec extends UnitSpec with MockitoSugar with BeforeAnd
   "XmlValidationService" should {
     "get location of xsd resource files from configuration" in  {
       await(xmlValidationService.validate(validFileUploadXml()))
-      //why ameq
       verify(mockConfiguration).getOptional[Seq[String]](propertyName)
     }
 

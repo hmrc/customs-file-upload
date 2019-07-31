@@ -35,7 +35,6 @@ import scala.xml.{NodeSeq, SAXException}
 class XmlValidationService @Inject()(val configuration: Configuration) {
 
   private val schemaPropertyName = "xsd.locations.fileupload"
-  
   private lazy val schema: Schema = {
     def resourceUrl(resourcePath: String): URL = Option(getClass.getResource(resourcePath))
       .getOrElse(throw new FileNotFoundException(s"XML Schema resource file: $resourcePath"))

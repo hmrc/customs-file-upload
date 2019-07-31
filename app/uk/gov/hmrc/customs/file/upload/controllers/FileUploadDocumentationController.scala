@@ -33,8 +33,6 @@ class FileUploadDocumentationController @Inject()(assets: Assets,
 
   private lazy val mayBeV1WhitelistedApplicationIds: Option[Seq[String]] = configuration.getOptional[Seq[String]]("api.access.version-1.0.whitelistedApplicationIds")
 
-/*  private lazy val mayBeV1WhitelistedApplicationIds = configuration.getStringSeq("api.access.version-1.0.whitelistedApplicationIds")*/
-
   def definition(): Action[AnyContent] = Action {
     logger.debugWithoutRequestContext("FileUploadDocumentationController definition endpoint has been called")
     Ok(uk.gov.hmrc.customs.file.upload.views.txt.definition(
