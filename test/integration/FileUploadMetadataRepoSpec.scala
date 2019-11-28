@@ -158,5 +158,15 @@ class FileUploadMetadataRepoSpec extends IntegrationTestSpec
 
       maybeFoundRecord shouldBe None
     }
+
+    "successfully delete all notifications" in new SetUp {
+      await(repository.create(FileMetadataWithFileOne))
+      await(repository.create(FileMetadataWithFileTwo))
+      collectionSize(repository) shouldBe 2
+
+      await(repository.deleteAll())
+
+      collectionSize(repository) shouldBe 0
+    }
   }
 }
