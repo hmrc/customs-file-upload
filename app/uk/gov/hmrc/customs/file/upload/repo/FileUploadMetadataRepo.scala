@@ -97,10 +97,10 @@ class FileUploadMetadataMongoRepo @Inject()(reactiveMongoComponent: ReactiveMong
 
   override def deleteAll(): Future[Unit] = {
 
-    logger.debugWithoutRequestContext(s"deleting all notifications")
+    logger.debugWithoutRequestContext(s"deleting all file upload metadata")
 
     removeAll().map {result =>
-      logger.debugWithoutRequestContext(s"deleted ${result.n} notifications")
+      logger.debugWithoutRequestContext(s"deleted ${result.n} file upload metadata")
     }
   }
 
