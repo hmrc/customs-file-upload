@@ -16,11 +16,6 @@ name := "customs-file-upload"
 scalaVersion := "2.12.10"
 targetJvm := "jvm-1.8"
 
-lazy val allResolvers = resolvers ++= Seq(
-  Resolver.bintrayRepo("hmrc", "releases"),
-  Resolver.jcenterRepo
-)
-
 lazy val ComponentTest = config("component") extend Test
 lazy val CdsIntegrationComponentTest = config("it") extend Test
 
@@ -49,8 +44,7 @@ lazy val microservice = (project in file("."))
     integrationComponentTestSettings,
     playPublishingSettings,
     allTest,
-    scoverageSettings,
-    allResolvers
+    scoverageSettings
   )
   .settings(majorVersion := 0)
 
